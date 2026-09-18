@@ -10,16 +10,22 @@ Python **3.12+** is required (do not use or modify system Python).
 
 ```bash
 # Create and activate a project-local virtual environment
-python3.13 -m venv .venv
-source .venv/bin/activate
+python3.13 -m venv venv
+source venv/bin/activate
 
 # Install the project in editable mode with development tools
 python -m pip install -e ".[dev]"
 ```
 
-The project uses plain `pip` and a project-local `.venv/`. Do not introduce
+The project uses plain `pip` and a project-local `venv/`. Do not introduce
 another package manager (Poetry, Hatch, PDM, uv, …) without an architectural
 discussion.
+
+> **Why `venv/` and not `.venv/`:** on the current development machine,
+> dot-prefixed paths are automatically given the macOS hidden flag, and
+> this Python build's `site.py` skips hidden `.pth` files — which silently
+> breaks the editable-install hook. A non-dot `venv/` directory is not
+> affected. (Found and recorded in the DEV-002 development record.)
 
 ## Quality Checks
 
@@ -36,25 +42,47 @@ mypy src/teachmemusic   # type checking
   does not exist.
 - Do not silence linter or type-checker categories to produce a green result.
 
+## Development Process
+
+Work proceeds in numbered development increments
+(`DEV-xxx`, see [PROJECT_STATUS.md](PROJECT_STATUS.md) for the chronological
+log and current handoff). The process rules — increment lifecycle, work-in-progress rule,
+Definitions of Ready and Done, commit and Git conventions, versioning,
+tooling policy — live in
+[docs/governance.md](docs/governance.md). Coding agents follow
+[AGENTS.md](AGENTS.md).
+
 ## Documentation Expectations
 
-Every significant development step must leave a development journal entry in
-`docs/development/` (see `001-project-foundation.md` for the template)
-covering: what changed, why, decisions made, alternatives considered,
-commands executed, tests performed, results, limitations, unresolved
-questions, and the next intended step.
+Every significant development step must:
 
-- Architecture changes require an ADR in `docs/decisions/`
-  (see [docs/decisions/README.md](docs/decisions/README.md)).
-- `CHANGELOG.md` records only functionality that actually exists.
-- Documentation must never describe functionality that does not exist.
+- leave a development journal entry in `docs/development/` (see
+  [TEMPLATE.md](docs/development/TEMPLATE.md)) covering: what changed, why,
+  decisions made, alternatives considered, commands executed, tests
+  performed, results, limitations, unresolved questions, and the next
+  intended step;
+- append a factual entry to `PROJECT_STATUS.md` after meaningful work or a
+  status change; never rewrite earlier entries, and leave the exact next action
+  for the next developer or LLM;
+- keep the [traceability matrix](docs/traceability/traceability-matrix.md)
+  updated when requirements, implementations, or verification evidence
+  change;
+- respect the artifact responsibilities in
+  [docs/README.md](docs/README.md) — link, don't duplicate;
+- record architecture changes as ADRs in `docs/decisions/`
+  (see [docs/decisions/README.md](docs/decisions/README.md));
+- keep `CHANGELOG.md` accurate: it records only what actually exists, and
+  documentation must never describe functionality that does not exist.
 
 ## Commit Expectations
 
-- Commit messages use the Conventional Commits style
-  (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, …) with a subject and a body
-  explaining *why* the change was made.
+Commit message conventions (Conventional Commits style, optional
+`Increment:`/`Implements:`/`Verifies:`/`Fixes:` metadata) are defined in
+[docs/governance.md](docs/governance.md#commit-conventions).
+
 - One logical change per commit; no partial, broken, or WIP states.
+- **Human review precedes every commit.** Never commit automatically; never
+  push without explicit approval.
 - Never commit secrets, credentials, machine-specific paths, or generated
   output. Check `git status` and `git diff` before committing.
 

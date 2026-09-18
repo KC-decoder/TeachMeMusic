@@ -4,6 +4,22 @@ TeachMeMusic develops in four stages. Each stage's output is the input of
 the next. This document is intentionally high-level; detailed designs are
 produced stage by stage and recorded in the development journal and ADRs.
 
+## Development Increments vs. Product Stages
+
+The **product stages** (A–D below) describe *capabilities*. Development
+happens in separately numbered **development increments** (`DEV-xxx`;
+lifecycle and rules in [governance.md](governance.md)):
+
+- DEV-001 — Project Foundation
+- DEV-002 — Development Governance & Traceability
+- DEV-003 — Reference Score Review and Ground Truth (Stage A)
+- DEV-004 — Canonical ScoreRepresentation (Stage A)
+- DEV-005 — Basic MusicXML Parser (Stage A)
+- …
+
+An increment serves a product stage but is not itself a stage; the two
+numberings must never be conflated.
+
 ## Stage A — Read
 
 **Question: what is written in the music?**
@@ -17,7 +33,11 @@ Stage A deliberately stops at the factual: it does not determine difficulty,
 motifs, phrase structure for teaching, learner ability, teaching strategy,
 lesson boundaries, exercises, or performance quality.
 
-Status: **foundation established; parser and representation not implemented.**
+Status: **DEV-003 is DONE. Its independent MusicXML/PDF inspections,
+comparison, and authoritative ground-truth consolidation found no musical
+discrepancy and were approved by the project owner. DEV-004 canonical-model
+planning is next but has not started. The parser and canonical representation
+are not implemented.**
 
 ## Stage B — Understand
 

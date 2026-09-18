@@ -70,8 +70,39 @@ Rules:
   external library: the parser is replaceable, but the domain model is
   stable and owned by TeachMeMusic.
 
-The shape of the canonical ScoreRepresentation itself is **not yet designed**;
-that is the next architectural task (see [score-schema.md](score-schema.md)).
+The shape of the canonical ScoreRepresentation itself is **not yet designed**.
+DEV-003 established the reference-score ground truth: its independent MusicXML
+and PDF inspections, comparison, and ground-truth consolidation are complete,
+with no musical discrepancy found. DEV-003 is DONE. Model design belongs to
+DEV-004, which is the next planned increment but has not started (see
+[score-schema.md](score-schema.md)).
+
+## Modularity Principles
+
+Explicit rules for how code is organized as it grows:
+
+- **Single responsibility.** Each module has one coherent responsibility.
+- **Explicit boundaries.** Architectural layers communicate through
+  intentional interfaces/contracts, not ad hoc access.
+- **Dependency direction.** Later conceptual layers may depend on stable
+  contracts from earlier layers, but not on their implementation details.
+  For example, future `pedagogy` code must never depend directly on
+  `music21`.
+- **External dependency containment.** Third-party library types are
+  contained at integration boundaries when practical (see ADR-0001 for the
+  score-ingestion boundary).
+- **No circular dependencies.** Circular package dependencies are an
+  architectural problem to be fixed, not tolerated.
+- **No speculative abstractions.** Do not create generalized frameworks
+  before concrete requirements justify them.
+- **Small comprehensible units.** Avoid giant modules/classes/functions;
+  if a component becomes difficult to understand independently, consider
+  decomposition.
+- **Public interfaces.** Public interfaces are typed and documented.
+- **Comments.** Comments explain WHY, constraints, invariants, or
+  non-obvious behavior — never narrate obvious code.
+- **Optimization order.** Correctness → understandability → measurement →
+  optimization. Do not optimize prematurely without evidence.
 
 ## Current State
 

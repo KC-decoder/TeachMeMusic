@@ -12,11 +12,19 @@ yield different learning strategies for different levels.
 
 ## Current Status
 
-> **Early development — Stage A foundation.**
+> **Early development - DEV-003 is complete; DEV-004 planning is next.**
 >
-> The repository currently contains the project foundation only: package
-> layout, tooling, and documentation. **No music parsing, musical analysis,
-> curriculum generation, or other product functionality exists yet.**
+> The repository contains the project foundation (DEV-001) and the
+> development-governance system (DEV-002): package layout, tooling, and
+> documentation. DEV-003 established and project-owner approved the
+> authoritative Hot Cross Buns fixture ground truth after independent
+> MusicXML/PDF inspection and comparison; no musical discrepancies were
+> found. DEV-004 has not started. **No music parsing,
+> musical analysis, curriculum generation, or other product functionality
+> exists yet.**
+>
+> For the chronological development log and current handoff, see
+> [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## Product Vision
 
@@ -53,9 +61,9 @@ TeachMeMusic canonical score representation
 
 Stage A intentionally does **not** determine difficulty, motifs, phrase
 structure, learner ability, teaching strategy, lesson boundaries, exercises,
-or performance quality — those belong to later stages. The canonical
-score representation has not been designed yet; it is the next architectural
-task (see [docs/score-schema.md](docs/score-schema.md)).
+or performance quality - those belong to later stages. DEV-003 first
+establishes reference-score ground truth; the canonical score representation
+will be designed afterward (see [docs/score-schema.md](docs/score-schema.md)).
 
 ## Development Roadmap
 
@@ -91,8 +99,8 @@ Requires Python 3.12+ (development was verified on Python 3.13).
 
 ```bash
 # 1. Create and activate a project-local virtual environment
-python3.13 -m venv .venv
-source .venv/bin/activate
+python3.13 -m venv venv
+source venv/bin/activate
 
 # 2. Install the project in editable mode with development tools
 python -m pip install -e ".[dev]"
@@ -111,6 +119,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 ```text
 TeachMeMusic/
 ├── README.md               # This file
+├── PROJECT_STATUS.md       # Append-only development log and LLM handoff
+├── AGENTS.md               # Operating rules for coding agents
 ├── CHANGELOG.md            # Notable changes (currently "Unreleased" only)
 ├── CONTRIBUTING.md         # Development guide and conventions
 ├── pyproject.toml          # Project metadata, tooling configuration
@@ -126,12 +136,16 @@ TeachMeMusic/
 
 ## Documentation
 
-- [docs/README.md](docs/README.md) — documentation index
-- [docs/architecture.md](docs/architecture.md) — layers and the canonical-representation boundary
+- [docs/README.md](docs/README.md) — documentation index and artifact responsibilities
+- [docs/governance.md](docs/governance.md) — development governance (lifecycle, Definitions of Ready/Done, commit and Git conventions)
+- [docs/architecture.md](docs/architecture.md) — layers, the canonical-representation boundary, modularity principles
 - [docs/development-roadmap.md](docs/development-roadmap.md) — stages A–D
+- [docs/requirements/](docs/requirements/README.md) — requirement conventions and established requirements
+- [docs/traceability/](docs/traceability/README.md) — traceability conventions and matrix
+- [docs/experiments/](docs/experiments/README.md) — experiment framework
 - [docs/score-schema.md](docs/score-schema.md) — status of the canonical score representation
 - [docs/decisions/](docs/decisions/README.md) — architecture decision records
-- [docs/development/](docs/development/001-project-foundation.md) — development journal
+- [docs/development/](docs/development/001-project-foundation.md) — development journal (one record per increment)
 
 ## Project Maturity
 
