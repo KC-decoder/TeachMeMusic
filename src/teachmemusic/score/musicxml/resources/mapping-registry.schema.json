@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://teachmemusic.local/schemas/musicxml-mapping-registry-1.json",
+  "title": "TeachMeMusic MusicXML mapping registry",
+  "type": "object",
+  "required": ["format", "inventory_format", "statuses", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "teachmemusic.musicxml.mapping-registry/1"
+    },
+    "inventory_format": {
+      "const": "teachmemusic.musicxml.inventory/1"
+    },
+    "statuses": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [
+        "component_key",
+        "versions",
+        "family",
+        "disposition",
+        "canonical_targets",
+        "handler",
+        "positive_tests",
+        "negative_tests",
+        "corpus_evidence",
+        "losslessness_evidence",
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "component_key": {"type": "string", "minLength": 1},
+        "versions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "family": {"type": "string", "minLength": 1},
+        "disposition": {
+          "enum": [
+            "canonical",
+            "package",
+            "boundary-control",
+            "standard-deprecated",
+            "extension-policy"
+          ]
+        },
+        "canonical_targets": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "handler": {"type": ["string", "null"]},
+        "source_policy": {"type": "string"},
+        "positive_tests": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "negative_tests": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "corpus_evidence": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "losslessness_evidence": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "inventoried",
+            "mapped",
+            "implemented",
+            "corpus-verified",
+            "losslessness-verified"
+          ]
+        }
+      }
+    }
+  }
+}

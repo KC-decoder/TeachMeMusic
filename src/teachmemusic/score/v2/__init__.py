@@ -1,0 +1,138 @@
+"""Canonical schema-v2 package contracts.
+
+Schema v1 remains readable while the final robustness and distribution gates
+remain open. MusicXML ingestion exposes schema v2 through the public score
+facade without leaking XML-library objects.
+"""
+
+from .auxiliary import (
+    AuxiliaryDocument,
+    OpusCatalog,
+    OpusItem,
+    SoundCatalog,
+    SoundCatalogEntry,
+    SoundCatalogMapping,
+)
+from .auxiliary_validation import AuxiliaryValidationIssue, validate_auxiliary_document
+from .documents import (
+    CANONICAL_SCHEMA_ID,
+    CANONICAL_SCHEMA_VERSION,
+    CanonicalDocument,
+    CanonicalMusicPackage,
+    CanonicalScoreContent,
+    MediaDocument,
+    OpusDocument,
+    PackageRelationship,
+    PackageRelationshipKind,
+    ScoreDocument,
+    SoundsDocument,
+    TemporalScoreContent,
+    V1CompatibilityContent,
+)
+from .identity import (
+    CanonicalId,
+    EntityKind,
+    EntityReference,
+    SourceLocation,
+    SourceMapEntry,
+)
+from .migration import CanonicalMigrationError, migrate_v1_score
+from .provenance import (
+    PackageProvenance,
+    SourceDocument,
+    SourceDocumentFormat,
+    Transformation,
+    TransformationKind,
+)
+from .serialization import (
+    CanonicalSerializationError,
+    canonical_from_json,
+    exact_number_from_dict,
+    exact_number_to_dict,
+    measured_value_from_dict,
+    measured_value_to_dict,
+    package_from_dict,
+    package_from_json,
+    package_to_dict,
+    package_to_json,
+)
+from .validation import (
+    CanonicalValidationError,
+    CanonicalValidationIssue,
+    require_valid_package,
+    validate_exact_number,
+    validate_measured_value,
+    validate_package,
+    validate_specified_value,
+)
+from .values import (
+    CanonicalUnit,
+    ExactDecimal,
+    ExactInteger,
+    ExactNumber,
+    ExactRational,
+    MeasuredValue,
+    SpecifiedValue,
+    ValueState,
+)
+
+__all__ = [
+    "CANONICAL_SCHEMA_ID",
+    "CANONICAL_SCHEMA_VERSION",
+    "CanonicalDocument",
+    "CanonicalId",
+    "CanonicalMigrationError",
+    "CanonicalMusicPackage",
+    "CanonicalScoreContent",
+    "CanonicalSerializationError",
+    "CanonicalUnit",
+    "CanonicalValidationError",
+    "CanonicalValidationIssue",
+    "EntityKind",
+    "EntityReference",
+    "ExactDecimal",
+    "ExactInteger",
+    "ExactNumber",
+    "ExactRational",
+    "MeasuredValue",
+    "MediaDocument",
+    "OpusDocument",
+    "PackageRelationship",
+    "PackageRelationshipKind",
+    "PackageProvenance",
+    "ScoreDocument",
+    "SoundsDocument",
+    "TemporalScoreContent",
+    "SourceDocument",
+    "SourceDocumentFormat",
+    "SourceLocation",
+    "SourceMapEntry",
+    "SpecifiedValue",
+    "Transformation",
+    "TransformationKind",
+    "V1CompatibilityContent",
+    "ValueState",
+    "AuxiliaryDocument",
+    "AuxiliaryValidationIssue",
+    "OpusCatalog",
+    "OpusItem",
+    "SoundCatalog",
+    "SoundCatalogEntry",
+    "SoundCatalogMapping",
+    "canonical_from_json",
+    "exact_number_from_dict",
+    "exact_number_to_dict",
+    "measured_value_from_dict",
+    "measured_value_to_dict",
+    "migrate_v1_score",
+    "package_from_dict",
+    "package_from_json",
+    "package_to_dict",
+    "package_to_json",
+    "require_valid_package",
+    "validate_exact_number",
+    "validate_measured_value",
+    "validate_package",
+    "validate_specified_value",
+    "validate_auxiliary_document",
+]

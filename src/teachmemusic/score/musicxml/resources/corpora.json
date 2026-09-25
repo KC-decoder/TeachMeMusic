@@ -1,0 +1,25 @@
+{
+  "format": "teachmemusic.musicxml.corpora/1",
+  "corpora": [
+    {
+      "id": "w3c-maintained-validation",
+      "run_id": "CORPUS-MXML-001",
+      "repository": "https://github.com/w3c-cg/musicxml.git",
+      "revision": "8097f21ac093aeed3e4edad5e41281ebfedda153",
+      "directory": "tests/files",
+      "recursive": false,
+      "expected_files": 7,
+      "extensions": [".musicxml"]
+    },
+    {
+      "id": "w3c-community-feature-suite",
+      "run_id": "CORPUS-MXML-002",
+      "repository": "https://github.com/w3c-cg/musicxmlTestSuite.git",
+      "revision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+      "directory": "xmlFiles",
+      "recursive": false,
+      "expected_files": 183,
+      "extensions": [".musicxml", ".mxl"]
+    }
+  ]
+}

@@ -1,0 +1,1104 @@
+{
+  "content_sha256": "7c758e2e8173c3a7c328a6ab2e9614fc1e984238ec694c45b630a96c12dd4126",
+  "format": "teachmemusic.musicxml.resource-manifest/1",
+  "repository": "https://github.com/w3c-cg/musicxml.git",
+  "source_format": "teachmemusic.musicxml.sources/1",
+  "versions": [
+    {
+      "commit": "e9acf2e13547a8d79203dccb596446d90aeedd78",
+      "directory": "1.0",
+      "dtd_entrypoints": [
+        "schema/partwise.dtd",
+        "schema/timewise.dtd",
+        "schema/opus.dtd"
+      ],
+      "files": [
+        {
+          "path": "schema/ISOlat1.pen",
+          "sha256": "15e8bd22c206e94f2716a77ef2b7f108a00dceb6d23460b5356510f30930264c",
+          "size": 5533
+        },
+        {
+          "path": "schema/ISOlat2.pen",
+          "sha256": "5455c731f2c002a3651df4e761bb5737bffe10d4f73dd8b501c0b7e380428bed",
+          "size": 7528
+        },
+        {
+          "path": "schema/MIDIEvents10.dtd",
+          "sha256": "c9549cb9f0dcb652292feb1b27050e807585f4781f430ee934d1a170718af026",
+          "size": 6363
+        },
+        {
+          "path": "schema/attributes.dtd",
+          "sha256": "e94f4fd89e2e2e35565f93b60e4bf70a6525e04e676ee60e7f65d399636ba610",
+          "size": 11424
+        },
+        {
+          "path": "schema/barline.dtd",
+          "sha256": "b96c532a2eb6458f1caad16a2c649157e2d728d82f5f85a9d078b19167d0b35d",
+          "size": 3127
+        },
+        {
+          "path": "schema/common.dtd",
+          "sha256": "f82e5d480c3c082785a6abc76230b2098271919a2a4c6908ffeb6d7a77769aeb",
+          "size": 15378
+        },
+        {
+          "path": "schema/direction.dtd",
+          "sha256": "b8fd1dd1091cbd533a625a2172979692e11e7be46e30de09a02ec117fd06a9c1",
+          "size": 16218
+        },
+        {
+          "path": "schema/identity.dtd",
+          "sha256": "48411ee1bcd54ab7f21addb3fb2f36461c28eb1c7920de64e3743a72ee4450c1",
+          "size": 2884
+        },
+        {
+          "path": "schema/license.html",
+          "sha256": "2cddcb934d46d880919d50ad28b99ea53e25379ac71c3f8644b27c833aa6f5c9",
+          "size": 7681
+        },
+        {
+          "path": "schema/link.dtd",
+          "sha256": "6b0172f10f697ca7d9a9b6f6ae38f9c1b217d9c4ec7d3f41de0d03bda5510bec",
+          "size": 1448
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "90ceba7daa86b614bf85b5b7b79bc70bb414a95617594b83d9a75617d2529bdb",
+          "size": 6366
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "fde29e82bdec80ef665844ce03d76e997ab7c4a96e579787967806b81a6e3c05",
+          "size": 1353
+        },
+        {
+          "path": "schema/note.dtd",
+          "sha256": "32b5427ea982447bf106bf2d915d433b8d7dedd2e0a18e68ab4fb30aa7ceb450",
+          "size": 26622
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "39af7ead11bab53d9d25a6feb9a92a2b047d00626fedd3be15b595f6179293de",
+          "size": 1701
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "ee239dceccec3d04a8df121e79ac93a550e1d2fa130de59ab4ca958d32fe3e3e",
+          "size": 5481
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "dfcffa75b8116ffc38c029ee4b56fffa92af10084b7e16a56d03a1c482d1fc9c",
+          "size": 3926
+        },
+        {
+          "path": "schema/score.dtd",
+          "sha256": "9e339689b670457ce85d2faa0b288e55917f916a728b37f2a2aad31960d45f57",
+          "size": 6979
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "2f4a8416ae95d1aebc0876f2dbabd4fb40c8a7764add3011f961bff779885dd4",
+          "size": 5601
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "c6e2602865cf39ccb4ea53053321c4d9fbd429d42f3aa6e5a312b6107a86ecd9",
+          "size": 3926
+        },
+        {
+          "path": "schema/to06c.xsl",
+          "sha256": "57034c4332e099d7e5df488bd17e443d2fdf5c88f9a5257e6a1dbe0827bdbf49",
+          "size": 5804
+        }
+      ],
+      "license_file": "schema/license.html",
+      "license_id": "MusicXML-DTD-Public-License-1.02",
+      "source_ref": "v1.0",
+      "status": "final",
+      "version": "1.0",
+      "xsd_entrypoints": []
+    },
+    {
+      "commit": "b1fd9ef5c8ff29d9c1b17f010aa314d252e5c5f9",
+      "directory": "1.1",
+      "dtd_entrypoints": [
+        "schema/partwise.dtd",
+        "schema/timewise.dtd",
+        "schema/opus.dtd"
+      ],
+      "files": [
+        {
+          "path": "schema/ISOlat1.pen",
+          "sha256": "15e8bd22c206e94f2716a77ef2b7f108a00dceb6d23460b5356510f30930264c",
+          "size": 5533
+        },
+        {
+          "path": "schema/ISOlat2.pen",
+          "sha256": "5455c731f2c002a3651df4e761bb5737bffe10d4f73dd8b501c0b7e380428bed",
+          "size": 7528
+        },
+        {
+          "path": "schema/MIDIEvents10.dtd",
+          "sha256": "c9549cb9f0dcb652292feb1b27050e807585f4781f430ee934d1a170718af026",
+          "size": 6363
+        },
+        {
+          "path": "schema/attributes.dtd",
+          "sha256": "2d5da4f2b3094a1bd09e94ecf6d82b7fe221d95530cca1fc010e6893cce912dd",
+          "size": 12854
+        },
+        {
+          "path": "schema/barline.dtd",
+          "sha256": "9f98c037871ba5b136151d26ade29d4d7b436cb76b20ec927d22cae654c489e9",
+          "size": 3435
+        },
+        {
+          "path": "schema/common.dtd",
+          "sha256": "bf65d4954331cfbe77792a5d219168e2045723a54d6fe58fd44049c1b80d6b0a",
+          "size": 20197
+        },
+        {
+          "path": "schema/direction.dtd",
+          "sha256": "d9c8320455d2dd00253f2b62542762647a2e6e3196901a8a6288c47a687d637f",
+          "size": 20321
+        },
+        {
+          "path": "schema/identity.dtd",
+          "sha256": "c72ff65e958498d6d87af201399574d64ffa7cde6b9d250db1dacdbea0b304e2",
+          "size": 2886
+        },
+        {
+          "path": "schema/layout.dtd",
+          "sha256": "8befcccf73f09899c97db67e4f54b432aef74e551c0d1d6ce742aa660aeb1b79",
+          "size": 4241
+        },
+        {
+          "path": "schema/license.html",
+          "sha256": "2cddcb934d46d880919d50ad28b99ea53e25379ac71c3f8644b27c833aa6f5c9",
+          "size": 7681
+        },
+        {
+          "path": "schema/link.dtd",
+          "sha256": "69a97aa74f547435aa90fb3cc85a41255f1c6d9ba485052c993f4eb64c889fdc",
+          "size": 1500
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "dcedf13409c3ffef56ce9ad2810585aac3b573fc0c7b5605bf0d065eaa857d6e",
+          "size": 6368
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "abaf12ab8cbeaa43ae3d870a19fa2321c5649082f943a6a2a5c30f792f0e724f",
+          "size": 1355
+        },
+        {
+          "path": "schema/note.dtd",
+          "sha256": "935b1f0a8e6fee0a4e142375d25b4312f6c85b47a70a4167de225ed34602f889",
+          "size": 30282
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "196bd1fb66fcfee94ea80d35b232cf4faa2f8941cfb073c8fac63fc9fcab2eb2",
+          "size": 1703
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "1a0fd3969d858d4d2ee72363c3257fa417fcd4dc9959beebfb0f7f4b652779f1",
+          "size": 5685
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "4ead473010db8ae4c977a40dd8dca3bf727f6ae9674f7e933689bffb6b456dce",
+          "size": 4069
+        },
+        {
+          "path": "schema/score.dtd",
+          "sha256": "23dfc5ddc71405607dfee2e339acaad619a5ca8f3de53ce2843006acf42c8281",
+          "size": 9804
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "71c7f5bb8e9bfd33711b2276f84154951d7fd0fae396b1e6b879ac6eeecf9f96",
+          "size": 5889
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "1ade9fbf1d4b9f4609ffefe7ac84f8ad16ecd9e9e6863c7199485af75955123d",
+          "size": 4069
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "77745dca95c021e999b89b234817985fa3a9694bd36cc1960422827f9ef4ede4",
+          "size": 6020
+        }
+      ],
+      "license_file": "schema/license.html",
+      "license_id": "MusicXML-DTD-Public-License-1.02",
+      "source_ref": "v1.1",
+      "status": "final",
+      "version": "1.1",
+      "xsd_entrypoints": []
+    },
+    {
+      "commit": "575f18c738c919d151a7e7e39e7e2fd6bc1d9eaf",
+      "directory": "2.0",
+      "dtd_entrypoints": [
+        "schema/container.dtd"
+      ],
+      "files": [
+        {
+          "path": "schema/attributes.mod",
+          "sha256": "455bcf675dfdf19b37ad9a806ce3444d5ffedb57eccece99c88d19ff6ae3a2bd",
+          "size": 15471
+        },
+        {
+          "path": "schema/barline.mod",
+          "sha256": "66416a43a4943f99660c9a14c1fb136f35c0d1f9e678024fbc4fbf01abd2174a",
+          "size": 4455
+        },
+        {
+          "path": "schema/common.mod",
+          "sha256": "4d7d798de64db96f79a4b7a66cedb00d845f7f24a92a970ece38446598fc0ea6",
+          "size": 29404
+        },
+        {
+          "path": "schema/container.dtd",
+          "sha256": "f1e35c2ca63b1404343ad7341932560e456e6178fd62d61a4a84eebad36e2843",
+          "size": 2951
+        },
+        {
+          "path": "schema/direction.mod",
+          "sha256": "ea5ad10e7e32c238cd65b3b5a29ec3dd5f4ccad6f18654abf406a29ca16f3c86",
+          "size": 28571
+        },
+        {
+          "path": "schema/identity.mod",
+          "sha256": "da9d554f16218c13b85c6f7210a5d36fcf7c5291506a69d53a7091afb0fd4653",
+          "size": 4030
+        },
+        {
+          "path": "schema/isolat1.ent",
+          "sha256": "2b64df2e72d297f43172615fbd225da5ea75ea6271e5f7596fb31754eba5948b",
+          "size": 6244
+        },
+        {
+          "path": "schema/isolat2.ent",
+          "sha256": "8196b10e425b18c542a86bc83398a7ee0331f5c58052bfbd1dce3c9a5ba682ff",
+          "size": 11072
+        },
+        {
+          "path": "schema/layout.mod",
+          "sha256": "352d896f51c6793f0d683b126450356eaf05ee9fda271da6ed955ce2743e5852",
+          "size": 6560
+        },
+        {
+          "path": "schema/license.html",
+          "sha256": "ffa25f5e073222c44623f2d676665e790b020ff681cb6fa50e7b722133c2d93c",
+          "size": 8639
+        },
+        {
+          "path": "schema/link.mod",
+          "sha256": "2e6a007dab450acc8060cc67c243a6c422af4966bf773259ffc14e75c96b5b65",
+          "size": 2613
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "011b2db0f2083c73988f25294e04d7e3ab41fa4c554ec30dd6656bbb1ca3eba6",
+          "size": 6538
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "bcbb5511868c1eead56891160fbf293fa51d7ecd3fb41317223bb456eefa6989",
+          "size": 1357
+        },
+        {
+          "path": "schema/musicxml.xsd",
+          "sha256": "d30314c0dc7fc9c3eef0e2befdaa144e0f90e2402722081f66d038d6807d276a",
+          "size": 248956
+        },
+        {
+          "path": "schema/note.mod",
+          "sha256": "e60cae2eabb5a5b77d12aaa8cdb958c06b8dea35239f83cda4502a6cbc1efff5",
+          "size": 32375
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "5f6da5e7041337afb34969decc6662264f10f320ebcbb11754073ffd3afd4ab7",
+          "size": 2481
+        },
+        {
+          "path": "schema/opus.xsd",
+          "sha256": "11f1dc29c1ca534b4733960f7172f84af9a41d51cb82b1142b94a226f52800aa",
+          "size": 5794
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "61905e23ab9f3a10b09d3599f96fcc9143610d6e6cce9fd89d6a869dad38cee3",
+          "size": 5715
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "e333bc7f9ec8437476a4e985c702f132dd65e7b46fc23f7510e69d3e314a4caa",
+          "size": 4172
+        },
+        {
+          "path": "schema/score.mod",
+          "sha256": "81da1a564460df56dd7135325fa40148c29ce5f838966e26414dc48df1bc82d5",
+          "size": 13909
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "15b7c9a871485fae9e706bd04ea1ecfb7fc1cc4911e79d7720353d0d44c530ab",
+          "size": 5919
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "5aee2d6dd7cb39ad56305c26076524a4acbf20a7b01595bff50e919c0d742b1d",
+          "size": 4172
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "ba953d4156bcd73a481451bec7cb6b1a21ff31c2e60b1f2c5005ab801685a1c5",
+          "size": 6151
+        },
+        {
+          "path": "schema/to11.xsl",
+          "sha256": "ffa084857f96b06446e235bae72fd331bdd4a6cac28d29dc855d00ed1e05c317",
+          "size": 7054
+        },
+        {
+          "path": "schema/xlink.xsd",
+          "sha256": "a8b0e752067c91c5ee70610d55af755324b2c4742e7599474982a07a4edc17a1",
+          "size": 2229
+        },
+        {
+          "path": "schema/xml.xsd",
+          "sha256": "616a3077df5cfc954ac74a75abe9697b95eef7a85dbe09367d995a483e840eb5",
+          "size": 5695
+        }
+      ],
+      "license_file": "schema/license.html",
+      "license_id": "MusicXML-DTD-Public-License-2.0",
+      "source_ref": "v2.0",
+      "status": "final",
+      "version": "2.0",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ]
+    },
+    {
+      "commit": "5fd8eb39a83733de4114455657e4529be2e8486d",
+      "directory": "3.0",
+      "dtd_entrypoints": [
+        "schema/container.dtd",
+        "schema/sounds.dtd"
+      ],
+      "files": [
+        {
+          "path": "schema/attributes.mod",
+          "sha256": "593fcea807063b4c98351efdf952561ee9a8566eb0c34855895b4e197ad55142",
+          "size": 19436
+        },
+        {
+          "path": "schema/barline.mod",
+          "sha256": "e7ddaa8843ebdecb5d5741b256414cb9f779c0ced9c84e36ca2707d5df5a0525",
+          "size": 4809
+        },
+        {
+          "path": "schema/common.mod",
+          "sha256": "5e2084b092f558f0aa6cfed543268326c58a3c826d7d48686f8de6ba6e51f531",
+          "size": 34527
+        },
+        {
+          "path": "schema/container.dtd",
+          "sha256": "c39a0d0804d3c57878461a92b990ed3f57c6e46ab0474f0cbd87d02cd4504152",
+          "size": 2910
+        },
+        {
+          "path": "schema/direction.mod",
+          "sha256": "111e0f837d7b82c1d1ef180372a0b14e8934e9636297f9a50c26eb7ed49bade7",
+          "size": 37002
+        },
+        {
+          "path": "schema/identity.mod",
+          "sha256": "767142b9ff9e80906fd35718a22f56f68411611d0dc163372f2a887ebae2e75c",
+          "size": 3989
+        },
+        {
+          "path": "schema/isolat1.ent",
+          "sha256": "2b64df2e72d297f43172615fbd225da5ea75ea6271e5f7596fb31754eba5948b",
+          "size": 6244
+        },
+        {
+          "path": "schema/isolat2.ent",
+          "sha256": "021a6e3320da37ecb7e05eac4734f3adff44790b25c61ddb0156d4d4c4bddab4",
+          "size": 11234
+        },
+        {
+          "path": "schema/layout.mod",
+          "sha256": "8ba18e87f76def833325fc1343df2001f1b69548616cbb93134418c3fe0d72a2",
+          "size": 8443
+        },
+        {
+          "path": "schema/license.html",
+          "sha256": "3cc8aeb0526cc0738fa9b8571660d4ddc28b02d2e029c88ca36be4eb057950bc",
+          "size": 8606
+        },
+        {
+          "path": "schema/link.mod",
+          "sha256": "cbe404b4b69c884648ac196ab8794312dc016f07bad6ec5cc32e4ba9d53b1a7e",
+          "size": 2725
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "b985b7e38ee1a2c3c1e4cde31f98c8da0e2e06153f8ae49fa538cd425aa23cd2",
+          "size": 6498
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "af8ddce0ab26fa901ca624406485f65e466fb6ef9c139614aec8d53f7c0cf07f",
+          "size": 1316
+        },
+        {
+          "path": "schema/musicxml.xsd",
+          "sha256": "6d66c0e3301ab9b9babd35f7dad762b9d1161af4c4fbd1680fcd06c101f44c7f",
+          "size": 296460
+        },
+        {
+          "path": "schema/note.mod",
+          "sha256": "06f27653ca65e475df5cbc43b4d3a24d1ebbfd37f4d6ca7c8cc422f81833bf55",
+          "size": 41341
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "2678660ce653c5c487bbeeea7a0f2b5d2965cd5ca4f05aa31003b673fbf806af",
+          "size": 2440
+        },
+        {
+          "path": "schema/opus.xsd",
+          "sha256": "cd3914e89315249082a38bc711579b49f6b00600a6464e7071f6ec17e6389e20",
+          "size": 5757
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "81a30df50cfa513def26e1239481647bf0488a3afdb952bf800c22e3060c10a1",
+          "size": 5502
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "4e60c818244d61d2171edd4b06f598f29b7dcca8ddfe80f6e0b0f5849b287a5c",
+          "size": 4131
+        },
+        {
+          "path": "schema/score.mod",
+          "sha256": "e11c3e7fa3310c83dc449bc313b9ea7d1f2f339844bae4363a97ee46871e4860",
+          "size": 14442
+        },
+        {
+          "path": "schema/sounds.dtd",
+          "sha256": "65fa842a1853030bbd538f33a6383f969919da79f131bdd7ab8b991391d36e16",
+          "size": 2936
+        },
+        {
+          "path": "schema/sounds.xml",
+          "sha256": "14101fd2565ad0d5d333bd29e515ecd32c14844fa12ad04f37f3caeca728d691",
+          "size": 33272
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "08257b9463de76afd9d9b5d1d4575590097c06ee99ea2d335984ed6c03f2ec22",
+          "size": 5703
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "7bb29ceaf8b917ad7bd06536f339615b6d3e5d67de43a2d319f921dfc9e56c3c",
+          "size": 4131
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "256989bee545c56bf08e1b96e1e56720fb618006310f59be2b0ebb3f62844431",
+          "size": 6109
+        },
+        {
+          "path": "schema/to11.xsl",
+          "sha256": "cdb4ecb98060b412b6f1843f1cd0aa6aaebe3b7f2117381acf8a402eae03bb50",
+          "size": 7013
+        },
+        {
+          "path": "schema/to20.xsl",
+          "sha256": "bb8e8e0695cdfc1e098a7617b80300fd1e0169a50bbad3300990a174558e5049",
+          "size": 10407
+        },
+        {
+          "path": "schema/xlink.xsd",
+          "sha256": "798182cfa0097d5c33310811c9e75bc2ff196515da5980a43599ce3a141b520f",
+          "size": 2183
+        },
+        {
+          "path": "schema/xml.xsd",
+          "sha256": "616a3077df5cfc954ac74a75abe9697b95eef7a85dbe09367d995a483e840eb5",
+          "size": 5695
+        }
+      ],
+      "license_file": "schema/license.html",
+      "license_id": "MusicXML-Public-License-3.0",
+      "source_ref": "v3.0",
+      "status": "final",
+      "version": "3.0",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ]
+    },
+    {
+      "commit": "8bbe8e50606bf99317a86e9e1637618d6bdd1997",
+      "directory": "3.1",
+      "dtd_entrypoints": [
+        "schema/container.dtd",
+        "schema/sounds.dtd"
+      ],
+      "files": [
+        {
+          "path": "schema/attributes.mod",
+          "sha256": "035bdbe53612df2c675ab0f9121787394390cd507ae5dbe1f098619a2e4d4a14",
+          "size": 20238
+        },
+        {
+          "path": "schema/barline.mod",
+          "sha256": "429c638a26288abbabeea77f58aae01f5adca9d9a6f8d154496970f34bb13049",
+          "size": 4943
+        },
+        {
+          "path": "schema/common.mod",
+          "sha256": "a653ecff92b4aded98ecaa79296efb25ceb8177b28fd490573f769b67aa141b4",
+          "size": 37932
+        },
+        {
+          "path": "schema/container.dtd",
+          "sha256": "26da38232d20c152388a1b9965b4be96c1f17fe1a4e72e152e53cec0d0759851",
+          "size": 5313
+        },
+        {
+          "path": "schema/direction.mod",
+          "sha256": "902e08ba8fd1f765e10c604a63cbc254d7ccf51874b63135cb26b1bdf7523057",
+          "size": 41960
+        },
+        {
+          "path": "schema/identity.mod",
+          "sha256": "e19088709962531a84277ddb33abd179e51efa86fe69e02d51ed9c9316feb67e",
+          "size": 4097
+        },
+        {
+          "path": "schema/isolat1.ent",
+          "sha256": "2b64df2e72d297f43172615fbd225da5ea75ea6271e5f7596fb31754eba5948b",
+          "size": 6244
+        },
+        {
+          "path": "schema/isolat2.ent",
+          "sha256": "021a6e3320da37ecb7e05eac4734f3adff44790b25c61ddb0156d4d4c4bddab4",
+          "size": 11234
+        },
+        {
+          "path": "schema/layout.mod",
+          "sha256": "89dccdc88c916e58377108c447c86fdf0afb86124d6a7f94a04b12abedf1f7d3",
+          "size": 10266
+        },
+        {
+          "path": "schema/link.mod",
+          "sha256": "b75a86e50bbb01d22debd4f6ebc312f13418f44d2f15e4955238874c84ead059",
+          "size": 2833
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "09dbda6670ca9bed768fe66b6fc89d0190a3176723cb21b597ad039b5e62f838",
+          "size": 6609
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "2f48dd5163538d140bd87df21e3be95851062041e9803289578f88c31568ced6",
+          "size": 1427
+        },
+        {
+          "path": "schema/musicxml.xsd",
+          "sha256": "49ae9e34e04ba5b72004687994f70d598323eb3353eadb62faedcc9e9dc4bd7f",
+          "size": 335762
+        },
+        {
+          "path": "schema/note.mod",
+          "sha256": "8fdec931a1871de6cc5ad6a4cab5411972ce3222552c1b605bcb482232177b15",
+          "size": 51384
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "680be7a0225b622d0ad2c2a36e5002a2d86389a80b2cf3332c70bc9b1d28906a",
+          "size": 2548
+        },
+        {
+          "path": "schema/opus.xsd",
+          "sha256": "0e0b0dc49061e8fd8e16e595890f7985a345fd9c89d1d59b0e1b7784e770fa89",
+          "size": 5854
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "707cb639ecf5a430e778d1f3da91c7d214b5879cebc6113571276d6a9893b900",
+          "size": 5774
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "453e73f94ccc0f8cf923202492b2451dc0ab664d86f1dd712990070a0ab35ce5",
+          "size": 4239
+        },
+        {
+          "path": "schema/score.mod",
+          "sha256": "722e1c03b129ec4ab3f7f125ef620245d28d159a79602f94c7c15c953d931475",
+          "size": 15476
+        },
+        {
+          "path": "schema/sounds.dtd",
+          "sha256": "e8d13a438147dd1cefeeedc9158f41e3bf3c9d2d8a9dd1019b87c25237b1aab2",
+          "size": 3044
+        },
+        {
+          "path": "schema/sounds.xml",
+          "sha256": "588962b7834259beba84dd3023eb79ec50d188f2ce79fcabfdc30b347ab12722",
+          "size": 33391
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "eb7a54d0f0729d59ca9ca33d0b547aeae09b7d7d5876560ac4d7f15eff3febaf",
+          "size": 6015
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "9306460320cc5face0eaf369e6b5d93c8589576e7485f03df26882203f65d2d3",
+          "size": 4239
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "afdeb00282dfb6927d5fb652a38fb1a2b666db40e4210253aebb0c66062aff08",
+          "size": 6217
+        },
+        {
+          "path": "schema/to11.xsl",
+          "sha256": "178c50267e11f238995597eba71d3f36d2ed94203cfc5d2dc643c3aa9a4490f3",
+          "size": 7121
+        },
+        {
+          "path": "schema/to20.xsl",
+          "sha256": "24a8b80e6730d5c279547b42cb08c1701b49b5f6de2be7aac0a8f338ee46c7e5",
+          "size": 10515
+        },
+        {
+          "path": "schema/to30.xsl",
+          "sha256": "33b379ef2a8ceef1c89a52f5f4288eb076216779984324fb229084d166462e7f",
+          "size": 12636
+        },
+        {
+          "path": "schema/xlink.xsd",
+          "sha256": "67c7f7a02491babc51e11c10268150b1a76070da36d5abe88e68515009611966",
+          "size": 2280
+        },
+        {
+          "path": "schema/xml.xsd",
+          "sha256": "616a3077df5cfc954ac74a75abe9697b95eef7a85dbe09367d995a483e840eb5",
+          "size": 5695
+        }
+      ],
+      "license_id": "W3C-Community-Final-Specification-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/final/",
+      "source_ref": "v3.1",
+      "status": "final",
+      "version": "3.1",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ]
+    },
+    {
+      "commit": "799e2defb2ece0ae7bafe08dcbcac25b2c631d53",
+      "directory": "4.0",
+      "dtd_entrypoints": [],
+      "files": [
+        {
+          "path": "schema/attributes.mod",
+          "sha256": "2481827cf1951341323afb8baf258627d8d759accf52b08e5c42cdc635eaec13",
+          "size": 25637
+        },
+        {
+          "path": "schema/barline.mod",
+          "sha256": "70c656478c2b118f4d9f0845f558b41f87a377bcb5eb9ea7ec879194defcb82f",
+          "size": 5550
+        },
+        {
+          "path": "schema/catalog.xml",
+          "sha256": "c65df54cbf1c6bd73a335d47c0ec292c4c1d7ecca20dbb6e36388bb169c71245",
+          "size": 11596
+        },
+        {
+          "path": "schema/common.mod",
+          "sha256": "20811e895496094fa7ecf556878e6bf7b0b3ec1d36a651796ea0f09ccb3b9502",
+          "size": 43542
+        },
+        {
+          "path": "schema/container.dtd",
+          "sha256": "6cc702ce25f4baca796163ba1fd38718db12d28ec821759aa4190f21aad0f8e6",
+          "size": 6027
+        },
+        {
+          "path": "schema/container.xsd",
+          "sha256": "deddcc2f51e856de21397bbe25e2cf304ca9e3253b0d25dcc6349c390bc22fa6",
+          "size": 7887
+        },
+        {
+          "path": "schema/direction.mod",
+          "sha256": "f9012c39c9da5c619231f82728077c3af95c6f0fefb1d7e9a17cdefa8bebfc6c",
+          "size": 55281
+        },
+        {
+          "path": "schema/identity.mod",
+          "sha256": "b459fe4fc2be8692878722e39d2846121f1099237e93a4d3c25751a4d4a4a7e1",
+          "size": 4209
+        },
+        {
+          "path": "schema/isolat1.ent",
+          "sha256": "2b64df2e72d297f43172615fbd225da5ea75ea6271e5f7596fb31754eba5948b",
+          "size": 6244
+        },
+        {
+          "path": "schema/isolat2.ent",
+          "sha256": "021a6e3320da37ecb7e05eac4734f3adff44790b25c61ddb0156d4d4c4bddab4",
+          "size": 11234
+        },
+        {
+          "path": "schema/layout.mod",
+          "sha256": "517839bc73ad8470899b2c5c3f26d604bc6892b15dee7ebc9dbceba59a8e9d01",
+          "size": 11551
+        },
+        {
+          "path": "schema/link.mod",
+          "sha256": "35cf25b2fe39ed43c9a24296b3a133587761892fa68b7be4745772038a24fc24",
+          "size": 2984
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "7d15526777ed3b0dc549a531c01638d2225a387b4bd13f29d633b8c2b84cef2d",
+          "size": 6981
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "a5b2abc08ef0e79adda741ea6bb6989912101267948a08983a55616ee5a6f6c2",
+          "size": 1505
+        },
+        {
+          "path": "schema/musicxml.xsd",
+          "sha256": "bfe37ed25a9ec00e6f2591d53df260b84efe12aed209ba3ac0a76f9287665a99",
+          "size": 379505
+        },
+        {
+          "path": "schema/note.mod",
+          "sha256": "6d5ff3c6a9752c499a46674e4c6582b647cc00bf556a16f3aa710e0a8c5551df",
+          "size": 55625
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "4b5df88e6d952eccbe9eb0b19db6fe77875625ef57bfed5c38a6a4586502bd29",
+          "size": 2981
+        },
+        {
+          "path": "schema/opus.xsd",
+          "sha256": "e8256607b9255075f16c1d70ed53f8384ab6e3b9dc4c1f81291cdd1d56b0474a",
+          "size": 6246
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "f798c3fb14187218d280f5b1f03c8ea0ab6b638a2d9b827b59bdeee2f1aab130",
+          "size": 5806
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "fa06d2668efc8ce787e8e6ae348cfc7a23945c6a375f85a6bb621ff28e19f0d2",
+          "size": 4687
+        },
+        {
+          "path": "schema/score.mod",
+          "sha256": "bdf2c05ccd99f93bf4773929f6a3b29edfaead4a6ad157887bfab81dfd3ce802",
+          "size": 17429
+        },
+        {
+          "path": "schema/sounds.dtd",
+          "sha256": "d8583a94b475f36df123a94c66d7ec10acf6fab6e6ccf5177c4cf1ba9b4148b4",
+          "size": 3528
+        },
+        {
+          "path": "schema/sounds.xml",
+          "sha256": "a73d52b7215ea567dd54c5f2ea3e9d4f7ea167a40d5770a8fe0e3cb458858b35",
+          "size": 33703
+        },
+        {
+          "path": "schema/sounds.xsd",
+          "sha256": "a3a423bcdf9f385f74d6bdf6024f7a29e70c4745de4825d33327f903124533e1",
+          "size": 7143
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "24e0472ca9b71eaadb5d346b8fb6f708bbef7a0fe24c3d6e9a96cb76d8cb8f58",
+          "size": 6047
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "c7bc76fad5db9ed1162c512bfe2b11fd840328bcb700fd90ea4c6cc97eba25ac",
+          "size": 4688
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "a678c924ab7144b64015de8af448b8cfed3060ca132b49b70c9c6960b0ecb2a4",
+          "size": 6214
+        },
+        {
+          "path": "schema/to11.xsl",
+          "sha256": "cb0138bf986da9f5483a8b4beda868fe3731c85d04b8237833dcd19a8e25eb8f",
+          "size": 7214
+        },
+        {
+          "path": "schema/to20.xsl",
+          "sha256": "0f9704777c92c332a979367e7acba49db3c9088b3acb5a3d2d60881160fde521",
+          "size": 10865
+        },
+        {
+          "path": "schema/to30.xsl",
+          "sha256": "d0c831dcf5590a1474cc6e66c86c88b452438b5d44c9a2572073a50e25dbf96b",
+          "size": 12765
+        },
+        {
+          "path": "schema/to31.xsl",
+          "sha256": "5b36e28d99d025908022fcc4c25b0d5b1c823c25b54ebf242367d08cb0ce69d9",
+          "size": 6291
+        },
+        {
+          "path": "schema/xlink.xsd",
+          "sha256": "6e601f8eeb41618b50e4c7f944dff754e57ea43b602755470dda24c9c2f6df92",
+          "size": 2280
+        },
+        {
+          "path": "schema/xml.xsd",
+          "sha256": "616a3077df5cfc954ac74a75abe9697b95eef7a85dbe09367d995a483e840eb5",
+          "size": 5695
+        }
+      ],
+      "license_id": "W3C-Community-Final-Specification-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/final/",
+      "source_ref": "v4.0",
+      "status": "final",
+      "version": "4.0",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/container.xsd",
+        "schema/sounds.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ]
+    },
+    {
+      "commit": "8097f21ac093aeed3e4edad5e41281ebfedda153",
+      "directory": "4.1-draft",
+      "dtd_entrypoints": [],
+      "files": [
+        {
+          "path": "schema/attributes.mod",
+          "sha256": "9412852379299708a21168849ce3c86edea0b4e812d204c276eb135c1c9792aa",
+          "size": 24917
+        },
+        {
+          "path": "schema/barline.mod",
+          "sha256": "e46880be740c049a770305d1250e5a1c91c38012f838c0e2e951db644c9743d4",
+          "size": 5400
+        },
+        {
+          "path": "schema/catalog.xml",
+          "sha256": "c2c446e96ade82840c0b90fb3322ac94d0fd5f9e90f01fb2912e823a8911887f",
+          "size": 12903
+        },
+        {
+          "path": "schema/common.mod",
+          "sha256": "a89ca23b2f11a489c8cc7d73571cae12835abf8bafc7d372a781ca1e5ce03ea6",
+          "size": 42173
+        },
+        {
+          "path": "schema/container.dtd",
+          "sha256": "d42c71c96f08e227ef8acd0c921807ab8416dc57ab26be5d0cda1166693e2944",
+          "size": 5831
+        },
+        {
+          "path": "schema/container.xsd",
+          "sha256": "fd973bd37d8520de705cb3d159c30fb14c53f4201e19f6942571c6e7908fe317",
+          "size": 9820
+        },
+        {
+          "path": "schema/direction.mod",
+          "sha256": "061f5dde081f1fc14300f6ffb2be381d893bca2fc99098af98fc1fb943d1d9a8",
+          "size": 53651
+        },
+        {
+          "path": "schema/identity.mod",
+          "sha256": "180313f97378a37b6e1ca240d7b5999919ce65102906210d88dd211569a2f4b3",
+          "size": 4075
+        },
+        {
+          "path": "schema/isolat1.ent",
+          "sha256": "2b64df2e72d297f43172615fbd225da5ea75ea6271e5f7596fb31754eba5948b",
+          "size": 6244
+        },
+        {
+          "path": "schema/isolat2.ent",
+          "sha256": "8196b10e425b18c542a86bc83398a7ee0331f5c58052bfbd1dce3c9a5ba682ff",
+          "size": 11072
+        },
+        {
+          "path": "schema/layout.mod",
+          "sha256": "47f2cc7dc71d3249d4d3286e2446f40c4d48e9148924c1c381ebee94e90d6f1c",
+          "size": 11231
+        },
+        {
+          "path": "schema/link.mod",
+          "sha256": "97732ab9bf726173ac3d27a7e21e5869296a3be5d90e6c182be20215ce2b5348",
+          "size": 2887
+        },
+        {
+          "path": "schema/midixml.dtd",
+          "sha256": "48f7ae906333eeae83e8053f631e2e7efc84c3dad044088c9ae7992503375b2e",
+          "size": 6739
+        },
+        {
+          "path": "schema/midixml.xsl",
+          "sha256": "2f0eafc27d1a67a47b9a58f1263877428f400b47f08f39102567a9c15a661c6a",
+          "size": 1443
+        },
+        {
+          "path": "schema/musicxml.xsd",
+          "sha256": "94da5aca64042604bbd5750327ae6b0534fefc6e101b463071265b474bcc6680",
+          "size": 621402
+        },
+        {
+          "path": "schema/note.mod",
+          "sha256": "bd0c0aab06c7e43ef1f7d80592c848088effb56b9dd441c72fc77a05bfdecbd5",
+          "size": 53886
+        },
+        {
+          "path": "schema/opus.dtd",
+          "sha256": "3fd8162168abe20b43ec5db2a5210a145dba8de6773f96a0fd87f05e860920fe",
+          "size": 2870
+        },
+        {
+          "path": "schema/opus.xsd",
+          "sha256": "f1a6a87313777b19244a30102496cce56f66da3b591f84dbe02c34511a234914",
+          "size": 9714
+        },
+        {
+          "path": "schema/parttime.xsl",
+          "sha256": "8e3a74f3285612be8eff01c5514dc3265760a7e380fbfc54ac1e60a101b77167",
+          "size": 5750
+        },
+        {
+          "path": "schema/partwise.dtd",
+          "sha256": "4d246581920518ce39188f673f2e2fc0f6e26cdf26b52c2a522938b082139d30",
+          "size": 4524
+        },
+        {
+          "path": "schema/score.mod",
+          "sha256": "9965d604fc73ab0709824a608137ee1c3d5f28d82f7ee0e60f5a24fc10b4320d",
+          "size": 16898
+        },
+        {
+          "path": "schema/sounds.dtd",
+          "sha256": "032065185f0f85f5f63777291d4507b3b2c79a459b5e7f08125240a33f6ebbd7",
+          "size": 3419
+        },
+        {
+          "path": "schema/sounds.xml",
+          "sha256": "58a5c0efe8e2ab921796b50c7eabfbfa4d9122be3e796b17544ef8aa63913926",
+          "size": 33384
+        },
+        {
+          "path": "schema/sounds.xsd",
+          "sha256": "b1c081ed20aa11f1d8eac44054595d826b99e899209d60a9d936be38b7aaccc1",
+          "size": 11726
+        },
+        {
+          "path": "schema/timepart.xsl",
+          "sha256": "4492041cb1fe78bfe745e810d76bf233c3f1a78c10fc5f3621b4a3eaa8945a0d",
+          "size": 5979
+        },
+        {
+          "path": "schema/timewise.dtd",
+          "sha256": "59356a95f7de948888421f72bb8441d3f0a5784cfa9de81744f7d57a5e320d4d",
+          "size": 4628
+        },
+        {
+          "path": "schema/to10.xsl",
+          "sha256": "17225b9538adcba9b9ec57c672d2b818b83633e9f6bf62b1c12b06ca82db91ce",
+          "size": 6002
+        },
+        {
+          "path": "schema/to11.xsl",
+          "sha256": "e6723c62ec70445cee67e06b4efa12b94bb41594b90e6df42719430d523e0827",
+          "size": 6858
+        },
+        {
+          "path": "schema/to20.xsl",
+          "sha256": "f78e651422ce24b3cf49068d530262e88ac6815a3e9fdb4da195eb3b3ad30109",
+          "size": 10460
+        },
+        {
+          "path": "schema/to30.xsl",
+          "sha256": "56e929e1e990e425f782f327c5b32d9a84a4d5aea249a107e16754e768bfac7e",
+          "size": 12270
+        },
+        {
+          "path": "schema/to31.xsl",
+          "sha256": "841a9fd051b8cff11a7317781d2014e1c6328b19553362a65d7358cf16084ae5",
+          "size": 6243
+        },
+        {
+          "path": "schema/to40.xsl",
+          "sha256": "8dc6da6f54244774fbabb2f6305f1b081c5a5cf8da7206985422481ccac0e925",
+          "size": 2608
+        },
+        {
+          "path": "schema/xlink.xsd",
+          "sha256": "abf0757e425bb34af4e3d6e5d7b5f296948701947a829182209db1d49ee1b5ed",
+          "size": 6179
+        },
+        {
+          "path": "schema/xml.xsd",
+          "sha256": "1a398424a907fcebc7e6e20016799159f042a88525fb0f0aa98f656dbe883aee",
+          "size": 5630
+        }
+      ],
+      "license_id": "W3C-Community-Contributor-License-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/cla/",
+      "source_ref": "8097f21ac093aeed3e4edad5e41281ebfedda153",
+      "status": "draft",
+      "version": "4.1-draft",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/container.xsd",
+        "schema/sounds.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,8 @@ name = "teachmemusic"
 version = "0.0.0"
 description = "Transform sheet music into a structured, interactive learning experience."
 readme = "README.md"
-requires-python = ">=3.12"
+license = "MIT"
+requires-python = ">=3.12,<3.14"
 authors = [{ name = "TeachMeMusic Contributors" }]
 keywords = ["music", "music-education", "sheet-music", "pedagogy", "piano"]
 classifiers = [
@@ -19,18 +20,31 @@ classifiers = [
     "Topic :: Education",
     "Topic :: Multimedia :: Sound/Audio",
 ]
-# No runtime dependencies yet. `music21` will be added deliberately when the
-# score-ingestion implementation starts (see ADR-0002).
+dependencies = [
+    # ADR-0005: contained XML/XSD/Schematron boundary. Exact pin verified by
+    # DEV-004 Task 7C before user-score parsing begins.
+    "lxml==6.1.3",
+]
 
 [project.optional-dependencies]
 dev = [
+    "lxml-stubs==0.5.1",
     "mypy>=1.10",
     "pytest>=8.0",
     "ruff>=0.5",
+    # DEV-004 Task 7I: official MusicXML rules are compiled as XPath/XSLT 3.
+    "saxonche==12.9.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"teachmemusic.score.musicxml" = [
+    "resources/*.json",
+    "resources/*.md",
+    "resources/*/schema/*",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

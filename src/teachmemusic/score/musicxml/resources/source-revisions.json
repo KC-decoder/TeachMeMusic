@@ -1,0 +1,128 @@
+{
+  "format": "teachmemusic.musicxml.sources/1",
+  "repository": "https://github.com/w3c-cg/musicxml.git",
+  "versions": [
+    {
+      "version": "1.0",
+      "directory": "1.0",
+      "status": "final",
+      "source_ref": "v1.0",
+      "commit": "e9acf2e13547a8d79203dccb596446d90aeedd78",
+      "license_id": "MusicXML-DTD-Public-License-1.02",
+      "license_file": "schema/license.html",
+      "xsd_entrypoints": [],
+      "dtd_entrypoints": [
+        "schema/partwise.dtd",
+        "schema/timewise.dtd",
+        "schema/opus.dtd"
+      ]
+    },
+    {
+      "version": "1.1",
+      "directory": "1.1",
+      "status": "final",
+      "source_ref": "v1.1",
+      "commit": "b1fd9ef5c8ff29d9c1b17f010aa314d252e5c5f9",
+      "license_id": "MusicXML-DTD-Public-License-1.02",
+      "license_file": "schema/license.html",
+      "xsd_entrypoints": [],
+      "dtd_entrypoints": [
+        "schema/partwise.dtd",
+        "schema/timewise.dtd",
+        "schema/opus.dtd"
+      ]
+    },
+    {
+      "version": "2.0",
+      "directory": "2.0",
+      "status": "final",
+      "source_ref": "v2.0",
+      "commit": "575f18c738c919d151a7e7e39e7e2fd6bc1d9eaf",
+      "license_id": "MusicXML-DTD-Public-License-2.0",
+      "license_file": "schema/license.html",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ],
+      "dtd_entrypoints": [
+        "schema/container.dtd"
+      ]
+    },
+    {
+      "version": "3.0",
+      "directory": "3.0",
+      "status": "final",
+      "source_ref": "v3.0",
+      "commit": "5fd8eb39a83733de4114455657e4529be2e8486d",
+      "license_id": "MusicXML-Public-License-3.0",
+      "license_file": "schema/license.html",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ],
+      "dtd_entrypoints": [
+        "schema/container.dtd",
+        "schema/sounds.dtd"
+      ]
+    },
+    {
+      "version": "3.1",
+      "directory": "3.1",
+      "status": "final",
+      "source_ref": "v3.1",
+      "commit": "8bbe8e50606bf99317a86e9e1637618d6bdd1997",
+      "license_id": "W3C-Community-Final-Specification-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/final/",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ],
+      "dtd_entrypoints": [
+        "schema/container.dtd",
+        "schema/sounds.dtd"
+      ]
+    },
+    {
+      "version": "4.0",
+      "directory": "4.0",
+      "status": "final",
+      "source_ref": "v4.0",
+      "commit": "799e2defb2ece0ae7bafe08dcbcac25b2c631d53",
+      "license_id": "W3C-Community-Final-Specification-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/final/",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/container.xsd",
+        "schema/sounds.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ],
+      "dtd_entrypoints": []
+    },
+    {
+      "version": "4.1-draft",
+      "directory": "4.1-draft",
+      "status": "draft",
+      "source_ref": "8097f21ac093aeed3e4edad5e41281ebfedda153",
+      "commit": "8097f21ac093aeed3e4edad5e41281ebfedda153",
+      "license_id": "W3C-Community-Contributor-License-Agreement",
+      "license_url": "https://www.w3.org/community/about/agreements/cla/",
+      "xsd_entrypoints": [
+        "schema/musicxml.xsd",
+        "schema/opus.xsd",
+        "schema/container.xsd",
+        "schema/sounds.xsd",
+        "schema/xlink.xsd",
+        "schema/xml.xsd"
+      ],
+      "dtd_entrypoints": []
+    }
+  ]
+}

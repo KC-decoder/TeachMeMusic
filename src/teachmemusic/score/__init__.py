@@ -1,15 +1,133 @@
-"""Stage A — score ingestion and canonical score representation.
+"""Stage A score-domain contract.
 
-This package will read MusicXML (``.xml``) and compressed MusicXML (``.mxl``)
-documents and convert them into TeachMeMusic's canonical,
-library-independent score representation — the contract between ingestion
-and every downstream system (analysis, pedagogy, curriculum, performance).
-
-Architectural constraint: external parsing-library objects (eventually
-``music21``) terminate inside this package; they must not leak into the rest
-of TeachMeMusic. See ``docs/architecture.md`` and ADR-0001.
-
-Status: intentionally not implemented. The canonical representation this
-package will define is the next architectural task — see
-``docs/score-schema.md``.
+External XML objects terminate inside the score-ingestion package. All
+downstream systems consume the library-independent models exported here.
 """
+
+from teachmemusic.score.models import (
+    CURRENT_SCHEMA_VERSION,
+    AttributeChange,
+    Barline,
+    BarlineLocation,
+    BarlineStyle,
+    BreakKind,
+    Clef,
+    ClefSign,
+    Creator,
+    HarmonySymbol,
+    KeySignature,
+    Lyric,
+    Measure,
+    MeasureAttributes,
+    NoteEvent,
+    Part,
+    PitchStep,
+    PlaybackData,
+    PresentationBreak,
+    PresentationData,
+    RestEvent,
+    RhythmicValue,
+    ScoreEvent,
+    ScoreMetadata,
+    ScoreRepresentation,
+    SourceFormat,
+    SourceReference,
+    Staff,
+    StemDirection,
+    Syllabic,
+    TimeSignature,
+    Voice,
+    WrittenPitch,
+    WrittenPitchClass,
+    WrittenRhythm,
+)
+from teachmemusic.score.musicxml.canonical_package import CanonicalPackageError
+from teachmemusic.score.parser import parse_musicxml_package
+from teachmemusic.score.serializer import (
+    ScoreSerializationError,
+    score_from_dict,
+    score_from_json,
+    score_to_dict,
+    score_to_json,
+)
+from teachmemusic.score.v2.documents import (
+    CanonicalMusicPackage,
+    CanonicalScoreContent,
+    MediaDocument,
+    OpusDocument,
+    PackageRelationship,
+    PackageRelationshipKind,
+    ScoreDocument,
+    SoundsDocument,
+)
+from teachmemusic.score.v2.serialization import package_from_json, package_to_json
+from teachmemusic.score.v2.validation import require_valid_package, validate_package
+from teachmemusic.score.validation import (
+    ScoreValidationError,
+    ValidationIssue,
+    require_valid_score,
+    validate_score,
+    written_duration,
+)
+
+__all__ = [
+    "CURRENT_SCHEMA_VERSION",
+    "AttributeChange",
+    "Barline",
+    "BarlineLocation",
+    "BarlineStyle",
+    "BreakKind",
+    "CanonicalMusicPackage",
+    "CanonicalPackageError",
+    "CanonicalScoreContent",
+    "Clef",
+    "ClefSign",
+    "Creator",
+    "HarmonySymbol",
+    "KeySignature",
+    "Lyric",
+    "Measure",
+    "MeasureAttributes",
+    "MediaDocument",
+    "NoteEvent",
+    "OpusDocument",
+    "PackageRelationship",
+    "PackageRelationshipKind",
+    "Part",
+    "PitchStep",
+    "PlaybackData",
+    "PresentationBreak",
+    "PresentationData",
+    "RestEvent",
+    "RhythmicValue",
+    "ScoreEvent",
+    "ScoreDocument",
+    "ScoreMetadata",
+    "ScoreRepresentation",
+    "ScoreSerializationError",
+    "ScoreValidationError",
+    "SourceFormat",
+    "SourceReference",
+    "Staff",
+    "StemDirection",
+    "SoundsDocument",
+    "Syllabic",
+    "TimeSignature",
+    "ValidationIssue",
+    "Voice",
+    "WrittenPitch",
+    "WrittenPitchClass",
+    "WrittenRhythm",
+    "package_from_json",
+    "package_to_json",
+    "parse_musicxml_package",
+    "require_valid_package",
+    "require_valid_score",
+    "score_from_dict",
+    "score_from_json",
+    "score_to_dict",
+    "score_to_json",
+    "validate_package",
+    "validate_score",
+    "written_duration",
+]
