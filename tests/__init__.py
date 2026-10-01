@@ -1,0 +1,1 @@
+"""TeachMeMusic verification suites."""

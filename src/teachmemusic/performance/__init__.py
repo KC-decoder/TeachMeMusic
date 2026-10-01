@@ -1,0 +1,61 @@
+"""Pure learner-performance contracts independent of MIDI and browser adapters."""
+
+from .contracts import (
+    PERFORMANCE_CONTRACT_ID,
+    PERFORMANCE_CONTRACT_VERSION,
+    AttemptCompletion,
+    CalibrationProfile,
+    EvidenceConfidence,
+    LearnerAttempt,
+    MidiEventKind,
+    NormalizedMidiEvent,
+    Observation,
+    ObservationDimension,
+    ObservationSource,
+    ObservationStatus,
+    PerformanceBundle,
+    RawMidiMessage,
+    SelfReportItem,
+)
+from .serialization import (
+    PerformanceSerializationError,
+    performance_bundle_from_dict,
+    performance_bundle_from_json,
+    performance_bundle_to_dict,
+    performance_bundle_to_json,
+)
+from .validation import (
+    PerformanceValidationError,
+    PerformanceValidationIssue,
+    is_stable_id,
+    require_valid_performance_bundle,
+    validate_performance_bundle,
+)
+
+__all__ = [
+    "PERFORMANCE_CONTRACT_ID",
+    "PERFORMANCE_CONTRACT_VERSION",
+    "AttemptCompletion",
+    "CalibrationProfile",
+    "EvidenceConfidence",
+    "LearnerAttempt",
+    "MidiEventKind",
+    "NormalizedMidiEvent",
+    "Observation",
+    "ObservationDimension",
+    "ObservationSource",
+    "ObservationStatus",
+    "PerformanceBundle",
+    "PerformanceSerializationError",
+    "PerformanceValidationError",
+    "PerformanceValidationIssue",
+    "RawMidiMessage",
+    "SelfReportItem",
+    "is_stable_id",
+    "performance_bundle_from_dict",
+    "performance_bundle_from_json",
+    "performance_bundle_to_dict",
+    "performance_bundle_to_json",
+    "require_valid_performance_bundle",
+    "validate_performance_bundle",
+]

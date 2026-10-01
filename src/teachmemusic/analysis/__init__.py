@@ -1,0 +1,68 @@
+"""Deterministic musical and task analysis over canonical scores."""
+
+from .analyzer import AnalysisError, analyze_canonical_score
+from .contracts import (
+    ANALYSIS_CONTRACT_ID,
+    ANALYSIS_CONTRACT_VERSION,
+    ANALYSIS_VERSION,
+    AnalysisConfidence,
+    AnalysisDemandDimension,
+    AnalysisDerivation,
+    AnalysisFact,
+    AnalysisFactKind,
+    AnalysisScope,
+    BoundaryCandidate,
+    BoundaryReason,
+    DemandEstimate,
+    LayerProfile,
+    RepetitionGroup,
+    RepetitionKind,
+    RhythmProfile,
+    ScoreAnalysis,
+    TextureProfile,
+)
+from .serialization import (
+    AnalysisSerializationError,
+    score_analysis_from_dict,
+    score_analysis_from_json,
+    score_analysis_to_dict,
+    score_analysis_to_json,
+)
+from .validation import (
+    AnalysisValidationError,
+    AnalysisValidationIssue,
+    require_valid_score_analysis,
+    validate_score_analysis,
+)
+
+__all__ = [
+    "ANALYSIS_CONTRACT_ID",
+    "ANALYSIS_CONTRACT_VERSION",
+    "ANALYSIS_VERSION",
+    "AnalysisConfidence",
+    "AnalysisDemandDimension",
+    "AnalysisDerivation",
+    "AnalysisError",
+    "AnalysisFact",
+    "AnalysisFactKind",
+    "AnalysisScope",
+    "AnalysisSerializationError",
+    "AnalysisValidationError",
+    "AnalysisValidationIssue",
+    "BoundaryCandidate",
+    "BoundaryReason",
+    "DemandEstimate",
+    "LayerProfile",
+    "RepetitionGroup",
+    "RepetitionKind",
+    "RhythmProfile",
+    "ScoreAnalysis",
+    "TextureProfile",
+    "analyze_canonical_score",
+    "require_valid_score_analysis",
+    "score_analysis_from_dict",
+    "score_analysis_from_json",
+    "score_analysis_to_dict",
+    "score_analysis_to_json",
+    "validate_score_analysis",
+]

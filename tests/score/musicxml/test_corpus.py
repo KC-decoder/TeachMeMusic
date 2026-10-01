@@ -119,14 +119,14 @@ def test_upstream_xpath3_schematron_distinguishes_valid_and_invalid() -> None:
     """TEST-MXML-CORPUS-019: pinned XPath 3 rules produce declared outcomes."""
 
     checkout = Path("/private/tmp/teachmemusic-task7i-musicxml")
-    if not checkout.is_dir():
-        pytest.skip("exact pinned maintained-corpus checkout is not available")
     tests = checkout / "tests"
     stylesheet = tests / "validations" / "beams-ties.xsl"
-    valid = _audit_schematron_file(tests / "files" / "beams-ties.musicxml", stylesheet, "pass")
-    invalid = _audit_schematron_file(
-        tests / "files" / "beams-ties.invalid.musicxml", stylesheet, "fail"
-    )
+    valid_source = tests / "files" / "beams-ties.musicxml"
+    invalid_source = tests / "files" / "beams-ties.invalid.musicxml"
+    if not all(path.is_file() for path in (stylesheet, valid_source, invalid_source)):
+        pytest.skip("exact pinned maintained-corpus checkout is not available")
+    valid = _audit_schematron_file(valid_source, stylesheet, "pass")
+    invalid = _audit_schematron_file(invalid_source, stylesheet, "fail")
     assert valid.validation_matches
     assert invalid.validation_matches
     assert invalid.diagnostic == "1 failed assertion(s)"
@@ -137,11 +137,13 @@ def test_pinned_corpora_record_independent_exporter_evidence() -> None:
 
     maintained = Path("/private/tmp/teachmemusic-task7i-musicxml")
     community = Path("/private/tmp/teachmemusic-task7i-suite")
-    if not maintained.is_dir() or not community.is_dir():
+    musescore_source = maintained / "tests/files/accidentals.musicxml"
+    sibelius_source = community / "xmlFiles/99a-Sibelius5-IgnoreBeaming.musicxml"
+    if not musescore_source.is_file() or not sibelius_source.is_file():
         pytest.skip("exact pinned corpus checkouts are not available")
 
-    musescore = _audit_file(maintained / "tests/files/accidentals.musicxml", "pass")
-    sibelius = _audit_file(community / "xmlFiles/99a-Sibelius5-IgnoreBeaming.musicxml", "pass")
+    musescore = _audit_file(musescore_source, "pass")
+    sibelius = _audit_file(sibelius_source, "pass")
 
     assert musescore.mapping == "mapped-zero-deferred"
     assert musescore.software == ("MuseScore 4.5.2",)

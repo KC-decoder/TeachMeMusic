@@ -14,6 +14,11 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Frontend and browser-proof dependencies/artifacts
+web/node_modules/
+web/test-results/
+web/playwright-report/
+
 # Build and distribution artifacts
 build/
 dist/
