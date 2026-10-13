@@ -72,3 +72,40 @@ test("TEST-APP-PLAYBACK-005 exposes transport controls, diagnostics, and score f
   unmount();
   expect(controller.dispose).toHaveBeenCalledOnce();
 });
+
+test("TEST-APP-PLAYBACK-009 announces demonstration completion once", () => {
+  let observer: ((snapshot: PlaybackSnapshot) => void) | null = null;
+  const onComplete = vi.fn();
+  const controller: PlaybackController = {
+    play: vi.fn(async () => undefined),
+    pause: vi.fn(),
+    restart: vi.fn(async () => undefined),
+    stop: vi.fn(),
+    seek: vi.fn(),
+    dispose: vi.fn(),
+  };
+  const factory = vi.fn((_plan: PlaybackPlan, nextObserver: (snapshot: PlaybackSnapshot) => void) => {
+    observer = nextObserver;
+    return controller;
+  });
+  render(<PlaybackSurface plan={plan} controllerFactory={factory} onComplete={onComplete} />);
+
+  const complete = {
+    status: "complete",
+    positionMicroseconds: 4_000_000,
+    durationMicroseconds: 4_000_000,
+    activeNoteIds: [],
+    activeMidiPitches: [],
+    activeNotes: [],
+    focusEventIds: [],
+    countInBeatsRemaining: 0,
+    errorCode: null,
+    errorMessage: null,
+  } as PlaybackSnapshot;
+  expect(observer).not.toBeNull();
+  const emit = observer as unknown as (snapshot: PlaybackSnapshot) => void;
+  emit(complete);
+  emit(complete);
+
+  expect(onComplete).toHaveBeenCalledOnce();
+});

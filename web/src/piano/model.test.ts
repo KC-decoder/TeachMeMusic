@@ -54,3 +54,39 @@ test("TEST-APP-PIANO-003 classifies written clefs without inventing hands", () =
   expect(classifyClef({ sign: "C", line: 4, octave_change: null })).toBe("tenor");
   expect(classifyClef(null)).toBe("unknown");
 });
+
+test("TEST-APP-PIANO-007 combines expected and played pitches without replacing the target", () => {
+  const state = buildPianoState(
+    [
+      activeNote("note:c", 60, "event:c", "G", 2),
+      activeNote("note:e", 64, "event:e", "G", 2),
+    ],
+    [60, 62, 62, 10, 127, -1, 60.5],
+  );
+
+  expect(state.keys.find((key) => key.midiPitch === 60)).toMatchObject({
+    active: true,
+    played: true,
+    match: true,
+    differentFromTarget: false,
+  });
+  expect(state.keys.find((key) => key.midiPitch === 62)).toMatchObject({
+    active: false,
+    played: true,
+    match: false,
+    differentFromTarget: true,
+  });
+  expect(state.keys.find((key) => key.midiPitch === 64)).toMatchObject({
+    active: true,
+    played: false,
+    match: false,
+    differentFromTarget: false,
+  });
+  expect(state.playedOutOfRange).toEqual([10, 127]);
+
+  const untargeted = buildPianoState([], [62]);
+  expect(untargeted.keys.find((key) => key.midiPitch === 62)).toMatchObject({
+    played: true,
+    differentFromTarget: false,
+  });
+});

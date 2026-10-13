@@ -54,8 +54,9 @@ from .contracts import (
 )
 from .validation import require_valid_lesson_plan
 
-PLANNER_VERSION = "deterministic-beginner-planner/0.1.0"
-BEGINNER_PLAN_POLICY_VERSION = "beginner-plan-policy/0.1.0"
+PLANNER_VERSION = "deterministic-beginner-planner/0.1.2"
+BEGINNER_PLAN_POLICY_VERSION = "beginner-plan-policy/0.1.2"
+_DEFAULT_START_TEMPO_PERCENT = 70
 
 
 class PlannerError(ValueError):
@@ -146,24 +147,24 @@ def generate_beginner_lesson_plan(
         )
     )
     first_segment = all_segments[0]
+    first_measure = (first_segment.ordinals[0],)
     core.append(
         _PlannedExercise(
             _canonical_exercise(
                 scope,
-                label="aural-preparation",
-                ordinals=first_segment.ordinals,
-                primary=SkillDomain.AURAL,
-                secondary=(SkillDomain.PITCH,),
-                modes=(PracticeMode.EAR_FIRST,),
-                support=_support(scope, "ear"),
+                label="first-measure-rehearsal",
+                ordinals=first_measure,
+                primary=SkillDomain.PITCH,
+                secondary=(SkillDomain.READING, SkillDomain.AURAL),
+                modes=(PracticeMode.FOLLOW_PITCH,),
+                support=_support(scope, "follow"),
                 dimensions=(ObservationDimension.PITCH, ObservationDimension.ORDER),
-                evidence_state=EvidenceState.ATTEMPTED,
+                evidence_state=EvidenceState.STABLE_SUPPORTED,
                 evidence_context=EvidenceContext.ACQUISITION,
                 boundary_reason=(
-                    "Use the first bounded melodic material for playing by ear before "
-                    "visible-note acquisition."
+                    "Rehearse only the first measure after whole-score orientation so "
+                    "the learner can verify the complete supported performance loop."
                 ),
-                pitched_event_limit=3,
             ),
             LessonNodeKind.EXERCISE,
         )
@@ -994,10 +995,10 @@ def _support(scope: _Scope, kind: str) -> SupportState:
             demonstration_available=True,
             follow_mode=False,
             metronome=False,
-            tempo_percent=100,
+            tempo_percent=_DEFAULT_START_TEMPO_PERCENT,
             max_replays=1,
             prompts_visible=True,
-            tempo_bpm=tempo,
+            tempo_bpm=_tempo_at_percent(tempo, _DEFAULT_START_TEMPO_PERCENT),
         )
     if kind == "ear":
         return SupportState(
@@ -1010,10 +1011,10 @@ def _support(scope: _Scope, kind: str) -> SupportState:
             demonstration_available=True,
             follow_mode=False,
             metronome=False,
-            tempo_percent=100,
+            tempo_percent=_DEFAULT_START_TEMPO_PERCENT,
             max_replays=1,
             prompts_visible=True,
-            tempo_bpm=None,
+            tempo_bpm=_tempo_at_percent(tempo, _DEFAULT_START_TEMPO_PERCENT),
         )
     if kind == "follow":
         return SupportState(
@@ -1080,6 +1081,12 @@ def _support(scope: _Scope, kind: str) -> SupportState:
             tempo_bpm=tempo,
         )
     raise PlannerError("PLANNER_SUPPORT", f"unknown support policy {kind!r}")
+
+
+def _tempo_at_percent(tempo: Fraction | None, percentage: int) -> Fraction | None:
+    if tempo is None:
+        return None
+    return tempo * Fraction(percentage, 100)
 
 
 def _events(scope: _Scope, ordinals: tuple[int, ...]) -> tuple[TemporalEvent, ...]:

@@ -119,3 +119,16 @@ test("TEST-APP-UI-003 requires an explicit choice for a multi-score package", as
   expect(await screen.findByLabelText(/more than one score/)).toHaveValue("score:one");
   expect(screen.getByRole("button", { name: "Prepare score" })).toBeInTheDocument();
 });
+
+test("TEST-APP-MOBILE-021 leaves file selection unfiltered for iPhone MusicXML packages", async () => {
+  vi.spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(new Response(JSON.stringify(config), { status: 200 }));
+
+  const { container } = render(<App />);
+  await screen.findByText("Choose a score");
+
+  const input = container.querySelector("input[type=file]");
+  expect(input).toBeEnabled();
+  expect(input).not.toHaveAttribute("accept");
+  expect(screen.getByText(/MusicXML or compressed MXL/)).toBeInTheDocument();
+});

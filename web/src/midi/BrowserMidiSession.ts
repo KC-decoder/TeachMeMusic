@@ -35,6 +35,10 @@ function emptySnapshot(permission: MidiSnapshot["permission"]): MidiSnapshot {
     permission,
     connection: "disconnected",
     capture: "idle",
+    capture_purpose: null,
+    capture_started_at_utc: null,
+    capture_start_microseconds: null,
+    capture_end_microseconds: null,
     inputs: [],
     selected_input_id: null,
     raw_messages: [],
@@ -151,6 +155,10 @@ export class BrowserMidiSession {
     this.clockOffsets = [];
     this.patch({
       capture: "recording",
+      capture_purpose: "calibration",
+      capture_started_at_utc: this.clock.nowUtc(),
+      capture_start_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      capture_end_microseconds: null,
       raw_messages: [],
       normalized_events: [],
       diagnostics: [],
@@ -160,34 +168,121 @@ export class BrowserMidiSession {
   }
 
   stopCalibration(): void {
-    if (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused") return;
+    if (this.snapshot.capture_purpose !== "calibration" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
     const calibration = this.buildCalibration(false);
-    this.patch({ capture: "stopped", active_notes: [], calibration });
+    this.patch({
+      capture: "stopped",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+      calibration,
+    });
   }
 
   abortCalibration(): void {
-    if (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused") return;
-    this.patch({ capture: "aborted", active_notes: [], calibration: null });
+    if (this.snapshot.capture_purpose !== "calibration" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
+    this.patch({
+      capture: "aborted",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+      calibration: null,
+    });
   }
 
   pauseCalibration(): void {
-    if (this.snapshot.capture !== "recording") return;
+    if (this.snapshot.capture_purpose !== "calibration" || this.snapshot.capture !== "recording") return;
     this.patch({ capture: "paused", active_notes: [] });
   }
 
   resumeCalibration(): void {
-    if (this.snapshot.capture !== "paused") return;
+    if (this.snapshot.capture_purpose !== "calibration" || this.snapshot.capture !== "paused") return;
     this.patch({ capture: "recording" });
   }
 
   stopForDiscomfort(): void {
-    if (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused") return;
+    if (this.snapshot.capture_purpose !== "calibration" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
     this.addDiagnostic(
       "LEARNER_DISCOMFORT_SAFE_STOP",
       "The learner reported discomfort. Capture stopped without a learner score or penalty.",
       false,
     );
-    this.patch({ capture: "aborted", active_notes: [], calibration: null });
+    this.patch({
+      capture: "aborted",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+      calibration: null,
+    });
+  }
+
+  startAttempt(): void {
+    if (this.snapshot.connection !== "connected" || !this.selectedInput ||
+        !this.snapshot.calibration?.approved) {
+      this.addDiagnostic(
+        "MIDI_ATTEMPT_NOT_READY",
+        "Connect the approved calibrated input before starting an attempt.",
+        true,
+      );
+      return;
+    }
+    this.sequence = 0;
+    this.patch({
+      capture: "recording",
+      capture_purpose: "attempt",
+      capture_started_at_utc: this.clock.nowUtc(),
+      capture_start_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      capture_end_microseconds: null,
+      raw_messages: [],
+      normalized_events: [],
+      diagnostics: [],
+      active_notes: [],
+    });
+  }
+
+  stopAttempt(): void {
+    if (this.snapshot.capture_purpose !== "attempt" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
+    this.patch({
+      capture: "stopped",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+    });
+  }
+
+  pauseAttempt(): void {
+    if (this.snapshot.capture_purpose !== "attempt" || this.snapshot.capture !== "recording") return;
+    this.patch({ capture: "paused", active_notes: [] });
+  }
+
+  resumeAttempt(): void {
+    if (this.snapshot.capture_purpose !== "attempt" || this.snapshot.capture !== "paused") return;
+    this.patch({ capture: "recording" });
+  }
+
+  abortAttempt(): void {
+    if (this.snapshot.capture_purpose !== "attempt" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
+    this.patch({
+      capture: "aborted",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+    });
+  }
+
+  stopAttemptForDiscomfort(): void {
+    if (this.snapshot.capture_purpose !== "attempt" ||
+        (this.snapshot.capture !== "recording" && this.snapshot.capture !== "paused")) return;
+    this.addDiagnostic(
+      "LEARNER_DISCOMFORT_SAFE_STOP",
+      "The learner reported discomfort. Capture stopped without a learner score or penalty.",
+      false,
+    );
+    this.patch({
+      capture: "aborted",
+      capture_end_microseconds: Math.round(this.clock.nowMilliseconds() * 1000),
+      active_notes: [],
+    });
   }
 
   approveCalibration(): void {
@@ -212,25 +307,29 @@ export class BrowserMidiSession {
   }
 
   private receive(data: Uint8Array | null, eventTimestampMilliseconds: number): void {
-    if (this.snapshot.capture !== "recording") return;
-    const receivedMilliseconds = this.clock.nowMilliseconds();
+    const recording = this.snapshot.capture === "recording";
     if (!data || data.length === 0) {
-      this.addDiagnostic("MIDI_EMPTY_MESSAGE", "An empty MIDI message was received.", false);
+      if (recording) {
+        this.addDiagnostic("MIDI_EMPTY_MESSAGE", "An empty MIDI message was received.", false);
+      }
       return;
     }
-    this.sequence += 1;
+    const receivedMilliseconds = this.clock.nowMilliseconds();
+    if (recording) this.sequence += 1;
     const raw: RawMidiMessage = {
-      id: `raw-midi:${this.sequence}`,
-      sequence_number: this.sequence,
+      id: recording ? `raw-midi:${this.sequence}` : "live-midi:transient",
+      sequence_number: recording ? this.sequence : 0,
       timestamp_microseconds: Math.round(eventTimestampMilliseconds * 1000),
       data: Array.from(data),
     };
     const normalized = normalizeMidiMessage(raw);
-    this.clockOffsets.push(Math.round((receivedMilliseconds - eventTimestampMilliseconds) * 1000));
+    if (recording) {
+      this.clockOffsets.push(Math.round((receivedMilliseconds - eventTimestampMilliseconds) * 1000));
+    }
     const active = new Set(this.snapshot.active_notes);
     const diagnostics = [...this.snapshot.diagnostics];
     if (normalized.kind === "note-on" && normalized.note !== null) {
-      if (active.has(normalized.note)) {
+      if (recording && active.has(normalized.note)) {
         diagnostics.push({
           code: "MIDI_DUPLICATE_NOTE_ON",
           message: `A second note-on arrived for MIDI ${normalized.note} before a note-off.`,
@@ -241,7 +340,7 @@ export class BrowserMidiSession {
       active.add(normalized.note);
     }
     if (normalized.kind === "note-off" && normalized.note !== null) {
-      if (!active.has(normalized.note)) {
+      if (recording && !active.has(normalized.note)) {
         diagnostics.push({
           code: "MIDI_UNMATCHED_NOTE_OFF",
           message: `A note-off arrived for inactive MIDI ${normalized.note}.`,
@@ -251,7 +350,7 @@ export class BrowserMidiSession {
       }
       active.delete(normalized.note);
     }
-    if (normalized.kind === "diagnostic") {
+    if (recording && normalized.kind === "diagnostic") {
       diagnostics.push({
         code: normalized.detail ?? "MIDI_UNINTERPRETED_MESSAGE",
         message: "A raw MIDI message was retained but could not be interpreted as a supported event.",
@@ -260,8 +359,10 @@ export class BrowserMidiSession {
       });
     }
     this.patch({
-      raw_messages: [...this.snapshot.raw_messages, raw],
-      normalized_events: [...this.snapshot.normalized_events, normalized],
+      raw_messages: recording ? [...this.snapshot.raw_messages, raw] : this.snapshot.raw_messages,
+      normalized_events: recording
+        ? [...this.snapshot.normalized_events, normalized]
+        : this.snapshot.normalized_events,
       diagnostics,
       active_notes: [...active].sort((left, right) => left - right),
     });

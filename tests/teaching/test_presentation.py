@@ -61,6 +61,21 @@ def test_canonical_exercise_projection_is_exact_bounded_and_traceable(
     assert encoded["demonstration"]["duration_microseconds"] == 8_000_000
 
 
+def test_opening_orientation_starts_below_the_score_tempo(
+    hot_cross_buns_package: CanonicalMusicPackage,
+) -> None:
+    """TEST-PRESENTATION-006: a new practice route opens at 70% tempo."""
+
+    plan = _plan(hot_cross_buns_package)
+    opening = plan.exercises[0]
+    value = build_exercise_presentation(hot_cross_buns_package, plan, opening.id)
+
+    assert opening.initial_support.tempo_percent == 70
+    assert opening.initial_support.tempo_bpm == Fraction(336, 5)
+    assert value.aid_state.tempo_bpm == Fraction(336, 5)
+    assert value.demonstration.tempo_controls[0].quarter_notes_per_minute == Fraction(336, 5)
+
+
 def test_presentation_aids_do_not_change_expected_content(
     hot_cross_buns_package: CanonicalMusicPackage,
 ) -> None:

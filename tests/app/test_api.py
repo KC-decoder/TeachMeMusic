@@ -217,3 +217,221 @@ def test_app_008_generates_and_projects_an_exact_beginner_exercise() -> None:
         )
         assert changed.status_code == 409
         assert changed.json()["diagnostics"][0]["code"] == "APP_TEACHING_PLAN_CHANGED"
+
+
+def test_app_009_runs_exports_resumes_and_continues_the_closed_loop() -> None:
+    """TEST-APP-009: a no-learning rehearsal crosses every authoritative boundary."""
+
+    store = SessionStore(max_sessions=4, ttl_seconds=1_800, id_factory=lambda: "session-1")
+    with TestClient(create_app(launch_token=TOKEN, store=store)) as client:
+        manifest = _upload(client).json()
+        score_id = manifest["scores"][0]["score_id"]
+        plan = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-plans",
+            headers=TOKEN_HEADER,
+            json={"score_id": score_id},
+        ).json()["plan"]
+        exercise = plan["exercises"][2]
+        projected = client.post(
+            f"/api/v1/viewer-sessions/session-1/teaching-plans/{plan['id']}"
+            f"/exercises/{exercise['id']}",
+            headers=TOKEN_HEADER,
+            json={"score_id": score_id},
+        ).json()["presentation"]
+
+        started = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-runs",
+            headers=TOKEN_HEADER,
+            json={
+                "score_id": score_id,
+                "plan_id": plan["id"],
+                "authorization_approved": True,
+                "capture_midi": True,
+                "capture_self_report": True,
+                "allow_export": True,
+                "audit_outcome": "pass-no-change",
+                "source_faithful": True,
+                "musically_coherent": True,
+                "safe": True,
+                "executable": True,
+                "reviewer": "project-owner",
+            },
+        )
+        assert started.status_code == 200
+        run_id = started.json()["run_id"]
+        assert started.json()["inspection"]["event_count"] == 4
+
+        events: list[dict[str, object]] = []
+        attempt_start = 1_000_000
+        serial = 0
+        for note in projected["demonstration"]["notes"]:
+            for kind, timestamp, velocity in (
+                ("note-on", attempt_start + note["start_microseconds"], 80),
+                ("note-off", attempt_start + note["end_microseconds"], 0),
+            ):
+                serial += 1
+                events.append(
+                    {
+                        "id": f"midi-event:{serial:04d}",
+                        "raw_message_id": None,
+                        "kind": kind,
+                        "timestamp_microseconds": timestamp,
+                        "channel": 1,
+                        "note": note["midi_pitch"],
+                        "velocity": velocity,
+                        "controller": None,
+                        "value": None,
+                        "detail": None,
+                    }
+                )
+        events.sort(key=lambda item: (item["timestamp_microseconds"], item["id"]))
+        attempt_end = max(int(item["timestamp_microseconds"]) for item in events) + 1
+        submission = {
+            "score_id": score_id,
+            "plan_id": plan["id"],
+            "exercise_id": exercise["id"],
+            "practice_mode": "follow-pitch",
+            "support_state_id": exercise["initial_support"]["id"],
+            "started_at_utc": "2026-10-02T12:00:00Z",
+            "start_microseconds": attempt_start,
+            "end_microseconds": attempt_end,
+            "completion": "completed",
+            "calibration": {
+                "version": "casio-browser-calibration-v1",
+                "device_id": "casio-px-770",
+                "input_name": "CASIO USB-MIDI",
+                "timestamp_origin": "browser-monotonic-microseconds",
+                "pitch_numbering_confirmed": True,
+                "sustain_available": True,
+                "clock_offset_microseconds": 0,
+                "clock_jitter_microseconds": 3_400,
+                "timing_window_microseconds": None,
+                "chord_window_microseconds": None,
+                "limitations": ["No physical or acoustic latency was measured."],
+                "approved": True,
+                "approved_at_utc": "2026-10-02T11:59:00Z",
+            },
+            "raw_messages": [],
+            "normalized_events": events,
+            "diagnostics": [],
+        }
+        first = client.post(
+            f"/api/v1/teaching-runs/{run_id}/attempts",
+            headers=TOKEN_HEADER,
+            json=submission,
+        )
+        assert first.status_code == 200, first.text
+        assert first.json()["decision"]["action"] == "integrate"
+        assert first.json()["mastery"]["action"] == "exercise-complete"
+        assert first.json()["mastery"]["green_percent"] == 100
+        assert first.json()["feedback"]["action"]
+        assert first.json()["inspection"]["attempt_count"] == 1
+
+        exported = client.post(
+            f"/api/v1/teaching-runs/{run_id}/exports",
+            headers=TOKEN_HEADER,
+        )
+        assert exported.status_code == 200
+        assert exported.json()["evidence"]["manifest"]["score_id"] == score_id
+        assert "score-partwise" not in exported.text
+
+        assert (
+            client.delete(f"/api/v1/teaching-runs/{run_id}", headers=TOKEN_HEADER).status_code
+            == 204
+        )
+        resumed = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-runs/import",
+            headers=TOKEN_HEADER,
+            json={"score_id": score_id, "archive": exported.json()},
+        )
+        assert resumed.status_code == 200, resumed.text
+        assert resumed.json()["inspection"]["attempt_count"] == 1
+
+        second = client.post(
+            f"/api/v1/teaching-runs/{run_id}/attempts",
+            headers=TOKEN_HEADER,
+            json={**submission, "started_at_utc": "2026-10-02T12:01:00Z"},
+        )
+        assert second.status_code == 200, second.text
+        assert second.json()["decision"]["action"] == "integrate"
+        assert second.json()["mastery"]["action"] == "exercise-complete"
+        assert second.json()["next_support"] is None
+
+
+def test_app_010_rejects_partial_gate_zero_approval() -> None:
+    """TEST-APP-010: a run cannot start with any owner precondition omitted."""
+
+    store = SessionStore(max_sessions=4, ttl_seconds=1_800, id_factory=lambda: "session-1")
+    with TestClient(create_app(launch_token=TOKEN, store=store)) as client:
+        manifest = _upload(client).json()
+        score_id = manifest["scores"][0]["score_id"]
+        plan = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-plans",
+            headers=TOKEN_HEADER,
+            json={"score_id": score_id},
+        ).json()["plan"]
+        response = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-runs",
+            headers=TOKEN_HEADER,
+            json={
+                "score_id": score_id,
+                "plan_id": plan["id"],
+                "authorization_approved": True,
+                "capture_midi": True,
+                "capture_self_report": False,
+                "allow_export": True,
+                "audit_outcome": "pass-no-change",
+                "source_faithful": True,
+                "musically_coherent": True,
+                "safe": False,
+                "executable": True,
+                "reviewer": "project-owner",
+            },
+        )
+        assert response.status_code == 422
+        assert response.json()["diagnostics"][0]["code"] == "APP_GATE_ZERO_PRECONDITION"
+
+
+def test_app_011_keeps_capture_and_export_authorization_granular() -> None:
+    """TEST-APP-011: MIDI-only local capture can start while export remains declined."""
+
+    store = SessionStore(max_sessions=4, ttl_seconds=1_800, id_factory=lambda: "session-1")
+    with TestClient(create_app(launch_token=TOKEN, store=store)) as client:
+        manifest = _upload(client).json()
+        score_id = manifest["scores"][0]["score_id"]
+        plan = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-plans",
+            headers=TOKEN_HEADER,
+            json={"score_id": score_id},
+        ).json()["plan"]
+        response = client.post(
+            "/api/v1/viewer-sessions/session-1/teaching-runs",
+            headers=TOKEN_HEADER,
+            json={
+                "score_id": score_id,
+                "plan_id": plan["id"],
+                "authorization_approved": True,
+                "capture_midi": True,
+                "capture_self_report": False,
+                "allow_export": False,
+                "audit_outcome": "pass-no-change",
+                "source_faithful": True,
+                "musically_coherent": True,
+                "safe": True,
+                "executable": True,
+                "reviewer": "project-owner",
+            },
+        )
+
+        assert response.status_code == 200, response.text
+        run_id = response.json()["run_id"]
+        evidence = client.app.state.teaching_run_store.evidence(run_id)
+        assert evidence.data_authorization.capture_midi is True
+        assert evidence.data_authorization.capture_self_report is False
+        assert evidence.data_authorization.allow_export is False
+        exported = client.post(
+            f"/api/v1/teaching-runs/{run_id}/exports",
+            headers=TOKEN_HEADER,
+        )
+        assert exported.status_code == 422
+        assert exported.json()["diagnostics"][0]["code"] == "EVIDENCE_EXPORT_DECLINED"

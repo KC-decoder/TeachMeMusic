@@ -27,7 +27,15 @@ export interface NotationRenderCallbacks {
 
 export interface NotationAdapter {
   load(payload: RendererPayload, callbacks?: NotationRenderCallbacks): Promise<NotationLayout>;
-  highlight(position: HighlightPosition): boolean;
+  emphasizeLayers(
+    positions: readonly HighlightPosition[],
+    activeCanonicalIds: readonly string[],
+    inactiveCanonicalIds: readonly string[],
+  ): boolean;
+  highlight(
+    positions: readonly HighlightPosition[],
+    canonicalIds?: readonly string[],
+  ): boolean;
   dispose(): void;
 }
 
@@ -78,7 +86,17 @@ export class OsmdNotationAdapter implements NotationAdapter {
   private osmd: OpenSheetMusicDisplay | null = null;
   private anchorLimit = 0;
   private batchTimer: number | null = null;
-  private lastHighlight: HighlightPosition | null = null;
+  private lastHighlight: {
+    positions: readonly HighlightPosition[];
+    canonicalIds?: readonly string[];
+  } | null = null;
+  private lastLayerEmphasis: {
+    positions: readonly HighlightPosition[];
+    activeCanonicalIds: readonly string[];
+    inactiveCanonicalIds: readonly string[];
+  } | null = null;
+  private highlightedNoteheads = new Set<Element>();
+  private layerNoteheads = new Set<Element>();
   private inlineSymbolNormalizationCount = 0;
 
   constructor(private readonly container: HTMLElement) {}
@@ -258,7 +276,16 @@ export class OsmdNotationAdapter implements NotationAdapter {
             true,
           ),
         );
-        if (progress.done && this.lastHighlight) this.highlight(this.lastHighlight);
+        if (progress.done && this.lastLayerEmphasis) {
+          this.emphasizeLayers(
+            this.lastLayerEmphasis.positions,
+            this.lastLayerEmphasis.activeCanonicalIds,
+            this.lastLayerEmphasis.inactiveCanonicalIds,
+          );
+        }
+        if (progress.done && this.lastHighlight) {
+          this.highlight(this.lastHighlight.positions, this.lastHighlight.canonicalIds);
+        }
         if (!progress.done) this.scheduleNextBatch(callbacks);
       } catch {
         callbacks.onError?.(
@@ -271,39 +298,156 @@ export class OsmdNotationAdapter implements NotationAdapter {
     }, 0);
   }
 
-  highlight(position: HighlightPosition): boolean {
+  emphasizeLayers(
+    positions: readonly HighlightPosition[],
+    activeCanonicalIds: readonly string[],
+    inactiveCanonicalIds: readonly string[],
+  ): boolean {
     const osmd = this.osmd;
-    if (!osmd) return false;
-    this.lastHighlight = position;
-    const onset =
-      position.onsetQuarters.numerator / position.onsetQuarters.denominator / 4;
+    if (!osmd || positions.length === 0 || activeCanonicalIds.length === 0) return false;
+    this.lastLayerEmphasis = { positions, activeCanonicalIds, inactiveCanonicalIds };
+    this.clearLayerNoteheads();
+    const active = new Set(activeCanonicalIds);
+    const inactive = new Set(inactiveCanonicalIds);
     let matched = true;
-    for (const cursor of osmd.cursors) {
+    for (const position of positions) {
+      const cursor = osmd.cursors[0];
+      if (!cursor) return false;
+      const onset =
+        position.onsetQuarters.numerator / position.onsetQuarters.denominator / 4;
       cursor.reset();
       let steps = 0;
       while (!cursor.Iterator.EndReached && steps <= this.anchorLimit) {
         const measure = cursor.Iterator.CurrentMeasureIndex;
         const current = cursor.Iterator.CurrentRelativeInMeasureTimestamp.RealValue;
-        if (measure > position.measureIndex || (measure === position.measureIndex && current >= onset)) {
+        if (
+          measure > position.measureIndex ||
+          (measure === position.measureIndex && current >= onset)
+        ) {
           break;
         }
         cursor.next();
         steps += 1;
       }
-      const measure = cursor.Iterator.CurrentMeasureIndex;
-      const current = cursor.Iterator.CurrentRelativeInMeasureTimestamp.RealValue;
-      cursor.show();
-      matched = matched && measure === position.measureIndex && Math.abs(current - onset) < 1e-9;
+      const graphicalNotes = cursor.GNotesUnderCursor() ?? [];
+      if (graphicalNotes.length !== position.canonicalIds.length) matched = false;
+      for (const [index, canonicalId] of position.canonicalIds.entries()) {
+        const role = active.has(canonicalId)
+          ? "active"
+          : inactive.has(canonicalId)
+            ? "inactive"
+            : null;
+        if (!role) continue;
+        const elements = this.noteheadElements(graphicalNotes[index]);
+        if (elements.length === 0) {
+          matched = false;
+          continue;
+        }
+        for (const element of elements) {
+          element.setAttribute("data-teachmemusic-layer-role", role);
+          this.layerNoteheads.add(element);
+        }
+      }
+    }
+    return matched;
+  }
+
+  highlight(
+    positions: readonly HighlightPosition[],
+    canonicalIds?: readonly string[],
+  ): boolean {
+    const osmd = this.osmd;
+    if (!osmd || positions.length === 0) return false;
+    this.lastHighlight = { positions, canonicalIds };
+    this.clearHighlightedNoteheads();
+    const requested = canonicalIds ? new Set(canonicalIds) : null;
+    let matched = true;
+    for (const position of positions) {
+      const onset =
+        position.onsetQuarters.numerator / position.onsetQuarters.denominator / 4;
+      for (const cursor of osmd.cursors) {
+        cursor.reset();
+        let steps = 0;
+        while (!cursor.Iterator.EndReached && steps <= this.anchorLimit) {
+          const measure = cursor.Iterator.CurrentMeasureIndex;
+          const current = cursor.Iterator.CurrentRelativeInMeasureTimestamp.RealValue;
+          if (
+            measure > position.measureIndex ||
+            (measure === position.measureIndex && current >= onset)
+          ) {
+            break;
+          }
+          cursor.next();
+          steps += 1;
+        }
+        const measure = cursor.Iterator.CurrentMeasureIndex;
+        const current = cursor.Iterator.CurrentRelativeInMeasureTimestamp.RealValue;
+        cursor.show();
+        matched =
+          matched && measure === position.measureIndex && Math.abs(current - onset) < 1e-9;
+      }
+
+      const graphicalNotes = osmd.cursors[0]?.GNotesUnderCursor() ?? [];
+      const requestedIndexes = requested
+        ? position.canonicalIds.flatMap((id, index) => requested.has(id) ? [index] : [])
+        : graphicalNotes.map((_note, index) => index);
+      if (requested && graphicalNotes.length !== position.canonicalIds.length) {
+        matched = false;
+      }
+      for (const index of requestedIndexes) {
+        const graphicalNote = graphicalNotes[index];
+        if (!graphicalNote) {
+          matched = false;
+          continue;
+        }
+        const elements = this.noteheadElements(graphicalNote);
+        if (elements.length === 0) matched = false;
+        for (const element of elements) {
+          element.setAttribute("data-teachmemusic-current-note", "true");
+          this.highlightedNoteheads.add(element);
+        }
+      }
     }
     const cursorElement = osmd.cursor.cursorElement;
     cursorElement.scrollIntoView?.({ block: "center", inline: "nearest" });
     return matched;
   }
 
+  private noteheadElements(graphicalNote: unknown): Element[] {
+    if (!graphicalNote) return [];
+    const note = graphicalNote as {
+      getNoteheadSVGs?: () => HTMLElement[];
+      getSVGGElement?: () => SVGGElement;
+    };
+    const noteheads = note.getNoteheadSVGs?.() ?? [];
+    return noteheads.length > 0
+      ? noteheads
+      : note.getSVGGElement
+        ? [note.getSVGGElement()]
+        : [];
+  }
+
+  private clearHighlightedNoteheads(): void {
+    for (const element of this.highlightedNoteheads) {
+      element.removeAttribute("data-teachmemusic-current-note");
+    }
+    this.highlightedNoteheads.clear();
+  }
+
+  private clearLayerNoteheads(): void {
+    for (const element of this.layerNoteheads) {
+      element.removeAttribute("data-teachmemusic-layer-role");
+    }
+    this.layerNoteheads.clear();
+  }
+
   dispose(): void {
     if (this.batchTimer !== null) globalThis.clearTimeout(this.batchTimer);
     this.batchTimer = null;
     this.lastHighlight = null;
+    this.lastLayerEmphasis = null;
+    this.clearHighlightedNoteheads();
+    this.clearLayerNoteheads();
     this.inlineSymbolNormalizationCount = 0;
     if (this.osmd) {
       for (const cursor of this.osmd.cursors) cursor.Dispose();

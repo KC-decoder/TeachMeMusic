@@ -164,3 +164,77 @@ test("TEST-MIDI-010 disconnect after approval preserves completed evidence", asy
     blocking: false,
   }));
 });
+
+test("TEST-MIDI-011 approved calibration is preserved across bounded attempt capture", async () => {
+  const { input, session, setNow } = fixture();
+  let latest = session.current();
+  session.subscribe((snapshot) => { latest = snapshot; });
+  await session.requestPermission();
+  await session.connect(input.id);
+  session.startCalibration();
+  [60, 62, 64, 65, 67].forEach((note, index) => input.emit([0x90, note, 70], 100 + index));
+  session.stopCalibration();
+  session.approveCalibration();
+  const approvedCalibration = latest.calibration;
+
+  setNow(200);
+  session.startAttempt();
+  input.emit([0x90, 60, 80], 201);
+  input.emit([0x80, 60, 0], 202);
+  setNow(203);
+  session.stopAttempt();
+
+  expect(latest.capture_purpose).toBe("attempt");
+  expect(latest.capture).toBe("stopped");
+  expect(latest.capture_started_at_utc).toBe("2026-10-01T20:00:00.000Z");
+  expect(latest.capture_start_microseconds).toBe(200_000);
+  expect(latest.capture_end_microseconds).toBe(203_000);
+  expect(latest.raw_messages).toHaveLength(2);
+  expect(latest.normalized_events.map((event) => event.kind)).toEqual(["note-on", "note-off"]);
+  expect(latest.calibration).toEqual(approvedCalibration);
+  expect(latest.calibration?.approved).toBe(true);
+});
+
+test("TEST-MIDI-012 attempt discomfort stop retains calibration and records no penalty", async () => {
+  const { input, session } = fixture();
+  let latest = session.current();
+  session.subscribe((snapshot) => { latest = snapshot; });
+  await session.requestPermission();
+  await session.connect(input.id);
+  session.startCalibration();
+  [60, 62, 64, 65, 67].forEach((note, index) => input.emit([0x90, note, 70], 100 + index));
+  session.stopCalibration();
+  session.approveCalibration();
+
+  session.startAttempt();
+  input.emit([0x90, 60, 80], 200);
+  session.stopAttemptForDiscomfort();
+
+  expect(latest.capture).toBe("aborted");
+  expect(latest.calibration?.approved).toBe(true);
+  expect(latest.diagnostics).toContainEqual(expect.objectContaining({
+    code: "LEARNER_DISCOMFORT_SAFE_STOP",
+    blocking: false,
+  }));
+});
+
+test("TEST-MIDI-013 exposes held keys without recording evidence outside an authorized capture", async () => {
+  const { input, session } = fixture();
+  let latest = session.current();
+  session.subscribe((snapshot) => { latest = snapshot; });
+  await session.requestPermission();
+  await session.connect(input.id);
+
+  input.emit([0x90, 60, 80], 100);
+  input.emit([0x90, 64, 70], 101);
+  expect(latest.active_notes).toEqual([60, 64]);
+  expect(latest.raw_messages).toEqual([]);
+  expect(latest.normalized_events).toEqual([]);
+
+  input.emit([0x80, 60, 0], 102);
+  expect(latest.active_notes).toEqual([64]);
+  input.emit([0x90, 64, 0], 103);
+  expect(latest.active_notes).toEqual([]);
+  expect(latest.raw_messages).toEqual([]);
+  expect(latest.normalized_events).toEqual([]);
+});

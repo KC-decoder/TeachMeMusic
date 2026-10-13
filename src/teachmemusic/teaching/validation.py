@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from teachmemusic.performance import (
     PERFORMANCE_CONTRACT_VERSION,
+    LearnerAttempt,
     ObservationDimension,
     ObservationSource,
     validate_performance_bundle,
@@ -28,7 +29,11 @@ from .contracts import (
     Exercise,
     FeedbackAction,
     FeedbackTiming,
+    GateDecision,
+    GateOutcome,
     LearnerContextSnapshot,
+    LearnerJournalEntry,
+    LearnerJournalKind,
     LearnerTrack,
     LessonNode,
     LessonNodeKind,
@@ -315,9 +320,12 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
     for field_name in (
         "plans",
         "audits",
+        "support_states",
         "evidence_records",
         "feedback_actions",
         "policy_decisions",
+        "journal_entries",
+        "gate_decisions",
         "run_events",
         "omissions",
     ):
@@ -345,17 +353,23 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
 
     plan_ids = _unique_ids(value.plans, "export.plans", issues)
     audit_ids = _unique_ids(value.audits, "export.audits", issues)
+    recorded_support_ids = _unique_ids(value.support_states, "export.support_states", issues)
     evidence_ids = _unique_ids(value.evidence_records, "export.evidence_records", issues)
     feedback_ids = _unique_ids(value.feedback_actions, "export.feedback_actions", issues)
     decision_ids = _unique_ids(value.policy_decisions, "export.policy_decisions", issues)
+    journal_ids = _unique_ids(value.journal_entries, "export.journal_entries", issues)
+    gate_ids = _unique_ids(value.gate_decisions, "export.gate_decisions", issues)
     event_ids = _unique_ids(value.run_events, "export.run_events", issues)
     family_ids = [
         {value.id, value.manifest.id, value.learner_context.id, value.data_authorization.id},
         plan_ids,
         audit_ids,
+        recorded_support_ids,
         evidence_ids,
         feedback_ids,
         decision_ids,
+        journal_ids,
+        gate_ids,
         event_ids,
     ]
     seen: set[str] = set()
@@ -366,7 +380,7 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
 
     plan_by_id = {plan.id: plan for plan in value.plans}
     exercise_by_id: dict[str, Exercise] = {}
-    support_ids: set[str] = set()
+    plan_support_ids: set[str] = set()
     requirement_ids: set[str] = set()
     node_ids: set[str] = set()
     for index, plan in enumerate(value.plans):
@@ -390,7 +404,7 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
             if exercise.id in exercise_by_id:
                 _add(issues, "TEACH_EXERCISE_DUPLICATE", "export.plans", "exercise ID repeats")
             exercise_by_id[exercise.id] = exercise
-            support_ids.add(exercise.initial_support.id)
+            plan_support_ids.add(exercise.initial_support.id)
             requirement_ids.update(item.id for item in exercise.exit_evidence)
             if (
                 exercise.anchor_set is not None
@@ -414,6 +428,17 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
                 )
         node_ids.update(node.id for node in plan.nodes)
 
+    if recorded_support_ids & plan_support_ids:
+        _add(
+            issues,
+            "TEACH_SUPPORT_DUPLICATE",
+            "export.support_states",
+            "recorded support duplicates a plan's initial support",
+        )
+    support_ids = plan_support_ids | recorded_support_ids
+    for index, support in enumerate(value.support_states):
+        _validate_support(support, f"export.support_states[{index}]", issues)
+
     for index, audit in enumerate(value.audits):
         _validate_audit(audit, f"export.audits[{index}]", plan_by_id, issues)
 
@@ -436,6 +461,45 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
     attempt_by_id = {item.id: item for item in value.performance.attempts}
     observation_by_id = {item.id: item for item in value.performance.observations}
     observation_ids = set(observation_by_id)
+    has_captured_evidence = any(
+        (
+            value.performance.calibrations,
+            value.performance.attempts,
+            value.performance.observations,
+            value.evidence_records,
+            value.feedback_actions,
+            value.policy_decisions,
+            value.journal_entries,
+            value.gate_decisions,
+        )
+    )
+    if has_captured_evidence and not value.data_authorization.approved:
+        _add(
+            issues,
+            "TEACH_DATA_AUTHORIZATION",
+            "export.data_authorization.approved",
+            "captured evidence exists without approval",
+        )
+    if (
+        value.performance.calibrations
+        or value.performance.attempts
+        or value.performance.observations
+    ) and not value.data_authorization.capture_midi:
+        _add(
+            issues,
+            "TEACH_DATA_AUTHORIZATION",
+            "export.data_authorization.capture_midi",
+            "MIDI evidence exists without authorization",
+        )
+    if (
+        value.journal_entries or any(attempt.self_report for attempt in value.performance.attempts)
+    ) and not value.data_authorization.capture_self_report:
+        _add(
+            issues,
+            "TEACH_DATA_AUTHORIZATION",
+            "export.data_authorization.capture_self_report",
+            "self-report evidence exists without authorization",
+        )
     for index, attempt in enumerate(value.performance.attempts):
         path = f"export.performance.attempts[{index}]"
         if attempt.run_id != value.manifest.id:
@@ -572,20 +636,81 @@ def validate_evidence_export(value: EvidenceExport) -> tuple[TeachingValidationI
             issues,
         )
 
+    for index, entry in enumerate(value.journal_entries):
+        _validate_journal_entry(
+            entry,
+            f"export.journal_entries[{index}]",
+            value.manifest,
+            value.data_authorization,
+            exercise_by_id,
+            attempt_by_id,
+            issues,
+        )
+    for index, gate_decision in enumerate(value.gate_decisions):
+        _validate_gate_decision(
+            gate_decision,
+            f"export.gate_decisions[{index}]",
+            value.manifest,
+            issues,
+        )
+
     payload_ids = {
+        value.id,
         value.manifest.id,
         value.learner_context.id,
         value.data_authorization.id,
         *plan_ids,
         *audit_ids,
+        *recorded_support_ids,
         *calibration_ids,
         *attempt_by_id,
         *observation_ids,
         *evidence_ids,
         *feedback_ids,
         *decision_ids,
+        *journal_ids,
+        *gate_ids,
     }
-    _validate_events(value.run_events, value.manifest.id, payload_ids, issues)
+    expected_event_payloads = {
+        RunEventKind.RUN_CREATED: {value.manifest.id},
+        RunEventKind.DATA_AUTHORIZED: {value.data_authorization.id},
+        RunEventKind.PLAN_GENERATED: plan_ids,
+        RunEventKind.PLAN_AUDITED: audit_ids,
+        RunEventKind.SUPPORT_RECORDED: recorded_support_ids,
+        RunEventKind.CALIBRATION_RECORDED: calibration_ids,
+        RunEventKind.ATTEMPT_RECORDED: set(attempt_by_id),
+        RunEventKind.OBSERVATION_RECORDED: observation_ids,
+        RunEventKind.EVIDENCE_RECORDED: evidence_ids,
+        RunEventKind.FEEDBACK_RECORDED: feedback_ids,
+        RunEventKind.POLICY_DECIDED: decision_ids,
+        RunEventKind.SELF_REPORT_RECORDED: {
+            item.id
+            for item in value.journal_entries
+            if item.kind in {LearnerJournalKind.SELF_REPORT, LearnerJournalKind.DISCOMFORT}
+        },
+        RunEventKind.OUTSIDE_PRACTICE_RECORDED: {
+            item.id
+            for item in value.journal_entries
+            if item.kind is LearnerJournalKind.OUTSIDE_PRACTICE
+        },
+        RunEventKind.PAUSED: {
+            item.id for item in value.journal_entries if item.kind is LearnerJournalKind.PAUSE
+        },
+        RunEventKind.STOPPED: {
+            item.id
+            for item in value.journal_entries
+            if item.kind in {LearnerJournalKind.STOP, LearnerJournalKind.DISCOMFORT}
+        },
+        RunEventKind.EXPORTED: {value.id},
+        RunEventKind.GATE_DECIDED: gate_ids,
+    }
+    _validate_events(
+        value.run_events,
+        value.manifest.id,
+        payload_ids,
+        expected_event_payloads,
+        issues,
+    )
     return tuple(issues)
 
 
@@ -1112,14 +1237,85 @@ def _validate_decision(
         _add(issues, "TEACH_POLICY_ACTION", f"{path}.action", "unknown action")
 
 
+def _validate_journal_entry(
+    entry: LearnerJournalEntry,
+    path: str,
+    manifest: TeachingRunManifest,
+    authorization: DataAuthorization,
+    exercises: Mapping[str, Exercise],
+    attempts: Mapping[str, LearnerAttempt],
+    issues: list[TeachingValidationIssue],
+) -> None:
+    for name in ("id", "run_id"):
+        _id(getattr(entry, name), f"{path}.{name}", issues)
+    for name in ("recorded_at_utc", "text"):
+        _nonempty(getattr(entry, name), f"{path}.{name}", issues)
+    if entry.run_id != manifest.id:
+        _add(issues, "TEACH_RUN_REFERENCE", f"{path}.run_id", "run differs")
+    if not isinstance(entry.kind, LearnerJournalKind):
+        _add(issues, "TEACH_JOURNAL_KIND", f"{path}.kind", "unknown journal kind")
+    if not authorization.capture_self_report:
+        _add(
+            issues,
+            "TEACH_DATA_AUTHORIZATION",
+            path,
+            "self-report capture is not authorized",
+        )
+    if entry.exercise_id is not None:
+        _id(entry.exercise_id, f"{path}.exercise_id", issues)
+        if entry.exercise_id not in exercises:
+            _add(
+                issues,
+                "TEACH_EXERCISE_REFERENCE",
+                f"{path}.exercise_id",
+                "exercise is missing",
+            )
+    if entry.attempt_id is not None:
+        _id(entry.attempt_id, f"{path}.attempt_id", issues)
+        if entry.attempt_id not in attempts:
+            _add(
+                issues,
+                "TEACH_ATTEMPT_REFERENCE",
+                f"{path}.attempt_id",
+                "attempt is missing",
+            )
+        elif (
+            entry.exercise_id is not None
+            and attempts[entry.attempt_id].exercise_id != entry.exercise_id
+        ):
+            _add(
+                issues,
+                "TEACH_EXERCISE_REFERENCE",
+                f"{path}.exercise_id",
+                "exercise differs from the referenced attempt",
+            )
+
+
+def _validate_gate_decision(
+    decision: GateDecision,
+    path: str,
+    manifest: TeachingRunManifest,
+    issues: list[TeachingValidationIssue],
+) -> None:
+    for name in ("id", "run_id", "gate_id"):
+        _id(getattr(decision, name), f"{path}.{name}", issues)
+    for name in ("decided_at_utc", "reason"):
+        _nonempty(getattr(decision, name), f"{path}.{name}", issues)
+    if decision.run_id != manifest.id:
+        _add(issues, "TEACH_RUN_REFERENCE", f"{path}.run_id", "run differs")
+    if not isinstance(decision.outcome, GateOutcome):
+        _add(issues, "TEACH_GATE_OUTCOME", f"{path}.outcome", "unknown gate outcome")
+
+
 def _validate_events(
     events: tuple[RunEvent, ...],
     run_id: str,
     payload_ids: set[str],
+    expected_payloads: Mapping[RunEventKind, set[str]],
     issues: list[TeachingValidationIssue],
 ) -> None:
     event_ids = {event.id for event in events}
-    previous_sequence = -1
+    events_by_id = {event.id: event for event in events}
     seen: set[str] = set()
     for index, event in enumerate(events):
         path = f"export.run_events[{index}]"
@@ -1129,18 +1325,24 @@ def _validate_events(
         _nonempty(event.occurred_at_utc, f"{path}.occurred_at_utc", issues)
         if event.run_id != run_id:
             _add(issues, "TEACH_RUN_REFERENCE", f"{path}.run_id", "event run differs")
-        if event.sequence_number <= previous_sequence:
+        if event.sequence_number != index:
             _add(
                 issues,
                 "TEACH_EVENT_ORDER",
                 f"{path}.sequence_number",
-                "sequence is not increasing",
+                "sequence must be contiguous and match tuple order",
             )
-        previous_sequence = event.sequence_number
         if event.payload_id not in payload_ids:
             _add(issues, "TEACH_EVENT_PAYLOAD", f"{path}.payload_id", "payload is missing")
         if not isinstance(event.kind, RunEventKind):
             _add(issues, "TEACH_EVENT_KIND", f"{path}.kind", "unknown event kind")
+        elif event.payload_id not in expected_payloads[event.kind]:
+            _add(
+                issues,
+                "TEACH_EVENT_KIND_PAYLOAD",
+                f"{path}.payload_id",
+                "payload family does not match event kind",
+            )
         if event.supersedes_event_id is not None:
             _id(event.supersedes_event_id, f"{path}.supersedes_event_id", issues)
             if event.supersedes_event_id not in event_ids:
@@ -1156,6 +1358,16 @@ def _validate_events(
                     "TEACH_EVENT_SUPERSEDES_ORDER",
                     f"{path}.supersedes_event_id",
                     "event is not earlier",
+                )
+            elif (
+                isinstance(event.kind, RunEventKind)
+                and events_by_id[event.supersedes_event_id].kind is not event.kind
+            ):
+                _add(
+                    issues,
+                    "TEACH_EVENT_SUPERSEDES_KIND",
+                    f"{path}.supersedes_event_id",
+                    "superseded event has another kind",
                 )
         seen.add(event.id)
 

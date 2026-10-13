@@ -19,6 +19,9 @@ export interface PianoKeyState {
   noteName: string;
   black: boolean;
   active: boolean;
+  played: boolean;
+  match: boolean;
+  differentFromTarget: boolean;
   clefs: ClefCategory[];
   noteIds: string[];
   canonicalEventIds: string[];
@@ -27,6 +30,7 @@ export interface PianoKeyState {
 export interface PianoState {
   keys: PianoKeyState[];
   outOfRange: ActivePlaybackNote[];
+  playedOutOfRange: number[];
 }
 
 const PITCH_NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
@@ -77,7 +81,10 @@ function orderedClefs(clefs: Set<ClefCategory>): ClefCategory[] {
   return CLEF_ORDER.filter((clef) => clefs.has(clef));
 }
 
-export function buildPianoState(activeNotes: ActivePlaybackNote[]): PianoState {
+export function buildPianoState(
+  activeNotes: ActivePlaybackNote[],
+  playedMidiPitches: readonly number[] = [],
+): PianoState {
   const byPitch = new Map<
     number,
     { noteIds: Set<string>; eventIds: Set<string>; clefs: Set<ClefCategory> }
@@ -102,18 +109,34 @@ export function buildPianoState(activeNotes: ActivePlaybackNote[]): PianoState {
     byPitch.set(note.midiPitch, value);
   }
 
+  const playedByPitch = new Set<number>();
+  const playedOutOfRange = new Set<number>();
+  for (const midiPitch of playedMidiPitches) {
+    if (!Number.isInteger(midiPitch) || midiPitch < 0 || midiPitch > 127) continue;
+    if (midiPitch < PIANO_MIN_MIDI || midiPitch > PIANO_MAX_MIDI) {
+      playedOutOfRange.add(midiPitch);
+    } else {
+      playedByPitch.add(midiPitch);
+    }
+  }
+  const hasExpectedTarget = byPitch.size > 0;
+
   const keys: PianoKeyState[] = [];
   for (let midiPitch = PIANO_MIN_MIDI; midiPitch <= PIANO_MAX_MIDI; midiPitch += 1) {
     const active = byPitch.get(midiPitch);
+    const played = playedByPitch.has(midiPitch);
     keys.push({
       midiPitch,
       noteName: midiNoteName(midiPitch),
       black: BLACK_PITCH_CLASSES.has(midiPitch % 12),
       active: active !== undefined,
+      played,
+      match: active !== undefined && played,
+      differentFromTarget: hasExpectedTarget && active === undefined && played,
       clefs: active ? orderedClefs(active.clefs) : [],
       noteIds: active ? [...active.noteIds] : [],
       canonicalEventIds: active ? [...active.eventIds] : [],
     });
   }
-  return { keys, outOfRange };
+  return { keys, outOfRange, playedOutOfRange: [...playedOutOfRange].sort((a, b) => a - b) };
 }

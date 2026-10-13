@@ -3,16 +3,24 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
   AppConfig,
+  AttemptResult,
+  AttemptSubmission,
   Diagnostic,
   PreparedBundle,
   SessionManifest,
   TeachingPlan,
+  TeachingRunResponse,
   ExercisePresentation,
   deleteSession,
+  deleteTeachingRun,
+  exportTeachingRun,
   getConfig,
+  importTeachingRun,
   prepareExercise,
   prepareScore,
   prepareTeachingPlan,
+  startTeachingRun,
+  submitTeachingAttempt,
   uploadScore,
 } from "./api";
 import { NotationSurface } from "./notation/NotationSurface";
@@ -20,6 +28,10 @@ import { PlaybackSurface } from "./playback/PlaybackSurface";
 import type { ActivePlaybackNote } from "./audio/PlaybackTransport";
 import { VirtualPiano } from "./piano/VirtualPiano";
 import { ExerciseLessonSurface } from "./teaching/ExerciseLessonSurface";
+import { BrowserMidiSession } from "./midi/BrowserMidiSession";
+import { MobileCompanionSession, claimPhonePairing } from "./mobile/transport";
+import { MobileBridgeSetup } from "./mobile/MobileBridgeSetup";
+import { RemoteMidiSession } from "./mobile/RemoteMidiSession";
 
 type Status = "starting" | "idle" | "loading" | "selecting" | "ready" | "error";
 
@@ -30,6 +42,8 @@ const fallbackDiagnostic: Diagnostic = {
 };
 
 export function App() {
+  const [desktopMidiSession] = useState(() => new BrowserMidiSession());
+  const [remoteMidiSession, setRemoteMidiSession] = useState<RemoteMidiSession | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [status, setStatus] = useState<Status>("starting");
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
@@ -37,6 +51,7 @@ export function App() {
   const [selectedScoreId, setSelectedScoreId] = useState("");
   const [teachingPlan, setTeachingPlan] = useState<TeachingPlan | null>(null);
   const [presentation, setPresentation] = useState<ExercisePresentation | null>(null);
+  const [teachingRun, setTeachingRun] = useState<TeachingRunResponse | null>(null);
   const [teachingLoading, setTeachingLoading] = useState(false);
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [playbackFocusEventIds, setPlaybackFocusEventIds] = useState<string[]>([]);
@@ -79,7 +94,20 @@ export function App() {
 
   useEffect(() => {
     let mounted = true;
-    void getConfig()
+    const query = new URLSearchParams(window.location.search);
+    const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const pairingId = query.get("pairing_id");
+    const phoneCapability = fragment.get("phone_capability");
+    const mobile = pairingId && phoneCapability
+      ? claimPhonePairing(pairingId, phoneCapability).then((phoneToken) => {
+          window.history.replaceState(null, "", `${window.location.pathname}?pairing_id=${encodeURIComponent(pairingId)}`);
+          const companion = new MobileCompanionSession(pairingId, phoneToken);
+          const remote = new RemoteMidiSession(companion);
+          if (mounted) setRemoteMidiSession(remote);
+          return getConfig({ pairing_id: pairingId, phone_token: phoneToken });
+        })
+      : getConfig();
+    void mobile
       .then((value) => {
         if (mounted) {
           setConfig(value);
@@ -94,8 +122,10 @@ export function App() {
       });
     return () => {
       mounted = false;
+      desktopMidiSession.dispose();
     };
-  }, []);
+  }, [desktopMidiSession]);
+  useEffect(() => () => remoteMidiSession?.dispose(), [remoteMidiSession]);
 
   async function chooseFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -114,6 +144,9 @@ export function App() {
         pendingSession = null;
         setManifest(nextManifest);
         setBundle(null);
+        setTeachingPlan(null);
+        setPresentation(null);
+        setTeachingRun(null);
         setSelectedScoreId(score.score_id);
         setStatus("selecting");
         if (previous && previous !== nextManifest.session_id) {
@@ -130,6 +163,7 @@ export function App() {
       setBundle(nextBundle);
       setTeachingPlan(teaching.plan);
       setPresentation(teaching.presentation);
+      setTeachingRun(null);
       setSelectedScoreId(score.score_id);
       setStatus("ready");
       if (previous && previous !== nextManifest.session_id) {
@@ -156,6 +190,7 @@ export function App() {
       setBundle(nextBundle);
       setTeachingPlan(teaching.plan);
       setPresentation(teaching.presentation);
+      setTeachingRun(null);
       setStatus("ready");
     } catch (error) {
       setDiagnostic(error instanceof ApiError ? error.diagnostic : fallbackDiagnostic);
@@ -175,6 +210,7 @@ export function App() {
         exerciseId,
         config,
         { tempoBpm },
+        teachingRun?.run_id,
       );
       setPresentation(result.presentation);
     } catch (error) {
@@ -184,13 +220,80 @@ export function App() {
     }
   }
 
+  async function beginTeachingRun(authorization: {
+    captureSelfReport: boolean;
+    allowExport: boolean;
+  }) {
+    if (!config || !manifest || !teachingPlan || !selectedScoreId) return;
+    const run = await startTeachingRun(
+      manifest.session_id,
+      selectedScoreId,
+      teachingPlan.id,
+      config,
+      authorization,
+    );
+    setTeachingRun(run);
+  }
+
+  async function submitAttempt(submission: AttemptSubmission): Promise<AttemptResult> {
+    if (!config || !teachingRun) throw new Error("Start the local teaching run first.");
+    const result = await submitTeachingAttempt(teachingRun.run_id, submission, config);
+    setTeachingRun((current) => current ? { ...current, inspection: result.inspection } : current);
+    if (result.plan) setTeachingPlan(result.plan);
+    if (result.presentation) setPresentation(result.presentation);
+    return result;
+  }
+
+  async function downloadEvidence() {
+    if (!config || !teachingRun) return;
+    const blob = await exportTeachingRun(teachingRun.run_id, config);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `teachmemusic-run-${new Date().toISOString().replaceAll(":", "-")}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function resumeEvidence(file: File) {
+    if (!config || !manifest || !selectedScoreId) return;
+    const archive = JSON.parse(await file.text()) as object;
+    const run = await importTeachingRun(
+      manifest.session_id,
+      selectedScoreId,
+      archive,
+      config,
+    );
+    setTeachingRun(run);
+  }
+
+  async function removeTeachingRun() {
+    if (!config || !teachingRun) return;
+    await deleteTeachingRun(teachingRun.run_id, config);
+    setTeachingRun(null);
+  }
+
   return (
-    <main className="app-shell">
+    <>
+      <section
+        className="landscape-orientation-gate"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="landscape-orientation-title"
+      >
+        <span className="landscape-orientation-icon" aria-hidden="true">↻</span>
+        <div>
+          <p className="eyebrow">LANDSCAPE PRACTICE</p>
+          <h1 id="landscape-orientation-title">Rotate your iPhone</h1>
+          <p>TeachMeMusic lessons are designed for landscape orientation.</p>
+        </div>
+      </section>
+      <main className="app-shell">
       <header className="masthead">
         <a className="wordmark" href="/" aria-label="TeachMeMusic home">
           <span aria-hidden="true">♪</span> TeachMeMusic
         </a>
-        <span className="phase">Beginner lesson preview</span>
+        <span className="phase">Local beginner teaching loop</span>
       </header>
 
       <section className="hero" aria-labelledby="page-title">
@@ -201,10 +304,13 @@ export function App() {
           Beginner lesson, and demonstrates each bounded exercise.
         </p>
 
+        {config && !config.mobile && (
+          <MobileBridgeSetup config={config} session={desktopMidiSession} />
+        )}
+
         <label className={`upload-card ${status === "loading" ? "is-loading" : ""}`}>
           <input
             type="file"
-            accept=".xml,.musicxml,.mxl"
             disabled={!config || status === "loading"}
             onChange={(event) => void chooseFile(event)}
           />
@@ -272,7 +378,18 @@ export function App() {
             notation={bundle.notation}
             loading={teachingLoading}
             onSelectExercise={(exerciseId) => void selectExercise(exerciseId)}
-            onTempoChange={(tempoBpm) => void selectExercise(presentation.exercise_id, tempoBpm)}
+            onTempoChange={(tempoBpm) => selectExercise(presentation.exercise_id, tempoBpm)}
+            teachingRun={teachingRun}
+            onStartRun={beginTeachingRun}
+            onSubmitAttempt={submitAttempt}
+            onExportRun={downloadEvidence}
+            onImportRun={resumeEvidence}
+            onDeleteRun={removeTeachingRun}
+            midiSession={config?.mobile ? remoteMidiSession ?? undefined : desktopMidiSession}
+            localMidiSession={config?.mobile ? null : desktopMidiSession}
+            onRemoteSubmit={remoteMidiSession
+              ? (context) => remoteMidiSession.submitAttempt(context)
+              : undefined}
           />
         ) : bundle ? (
           <>
@@ -294,6 +411,7 @@ export function App() {
         <span>Local-first Beginner lesson</span>
         <span>Original uploads are not retained</span>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

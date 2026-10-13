@@ -8,6 +8,11 @@ import {
   createOsmdNotationAdapter,
 } from "./OsmdNotationAdapter";
 import { HighlightPosition, buildHighlightPositions } from "./navigation";
+import {
+  NotationLayerEmphasis,
+  NotationLayerEmphasisError,
+  resolveNotationLayerEmphasis,
+} from "./layerEmphasis";
 
 type AdapterFactory = (container: HTMLElement) => NotationAdapter;
 
@@ -15,6 +20,7 @@ interface NotationSurfaceProps {
   bundle: ViewerBundle;
   focusEventIds?: readonly string[];
   allowedEventIds?: readonly string[];
+  layerEmphasis?: NotationLayerEmphasis;
   adapterFactory?: AdapterFactory;
 }
 
@@ -37,6 +43,7 @@ export function NotationSurface({
   bundle,
   focusEventIds = [],
   allowedEventIds,
+  layerEmphasis,
   adapterFactory = createOsmdNotationAdapter,
 }: NotationSurfaceProps) {
   const container = useRef<HTMLDivElement | null>(null);
@@ -51,21 +58,54 @@ export function NotationSurface({
         : bundle.renderer.anchors,
     );
   }, [allowedEventIds, bundle.renderer.anchors]);
+  const resolvedLayerEmphasis = useMemo(() => {
+    if (!layerEmphasis) return { value: null, error: null };
+    try {
+      return {
+        value: resolveNotationLayerEmphasis(
+          bundle.renderer.anchors,
+          layerEmphasis,
+          allowedEventIds,
+        ),
+        error: null,
+      };
+    } catch (reason: unknown) {
+      const error =
+        reason instanceof NotationLayerEmphasisError
+          ? reason
+          : new NotationLayerEmphasisError(
+              "TMM_PRESENTATION_LAYER_INVALID",
+              "The active notation layer could not be verified.",
+            );
+      return { value: null, error };
+    }
+  }, [allowedEventIds, bundle.renderer.anchors, layerEmphasis]);
   const [layout, setLayout] = useState<NotationLayout | null>(null);
   const [positionIndex, setPositionIndex] = useState(0);
   const [rendering, setRendering] = useState(true);
   const [error, setError] = useState<SurfaceError | null>(null);
   const [highlightWarning, setHighlightWarning] = useState(false);
+  const [layerWarning, setLayerWarning] = useState(false);
 
   useEffect(() => {
     const target = container.current;
     if (!target) return;
+    if (resolvedLayerEmphasis.error) {
+      setLayout(null);
+      setRendering(false);
+      setError({
+        code: resolvedLayerEmphasis.error.code,
+        message: resolvedLayerEmphasis.error.message,
+      });
+      return;
+    }
     let cancelled = false;
     const nextAdapter = adapterFactory(target);
     adapter.current = nextAdapter;
     setRendering(true);
     setError(null);
     setHighlightWarning(false);
+    setLayerWarning(false);
     setPositionIndex(0);
     void nextAdapter
       .load(bundle.renderer, {
@@ -95,7 +135,16 @@ export function NotationSurface({
           );
         }
         setLayout(nextLayout);
-        setHighlightWarning(!nextAdapter.highlight(positions[0]));
+        if (resolvedLayerEmphasis.value) {
+          setLayerWarning(
+            !nextAdapter.emphasizeLayers(
+              positions,
+              resolvedLayerEmphasis.value.activeEventIds,
+              resolvedLayerEmphasis.value.inactiveEventIds,
+            ),
+          );
+        }
+        setHighlightWarning(!nextAdapter.highlight([positions[0]]));
         setRendering(false);
       })
       .catch((reason: unknown) => {
@@ -115,19 +164,20 @@ export function NotationSurface({
       nextAdapter.dispose();
       if (adapter.current === nextAdapter) adapter.current = null;
     };
-  }, [adapterFactory, bundle.renderer, positions]);
+  }, [adapterFactory, bundle.renderer, positions, resolvedLayerEmphasis]);
 
   useEffect(() => {
     if (rendering || focusEventIds.length === 0 || !adapter.current) return;
     const requested = new Set(focusEventIds);
-    const nextIndex = positions.findIndex((position) =>
+    const focusedPositions = positions.filter((position) =>
       position.canonicalIds.some((id) => requested.has(id)),
     );
-    if (nextIndex < 0) return;
-    const position = positions[nextIndex];
+    if (focusedPositions.length === 0) return;
+    const position = focusedPositions.at(-1);
     if (!position) return;
+    const nextIndex = positions.indexOf(position);
     setPositionIndex(nextIndex);
-    setHighlightWarning(!adapter.current.highlight(position));
+    setHighlightWarning(!adapter.current.highlight(focusedPositions, focusEventIds));
   }, [focusEventIds, positions, rendering]);
 
   const current = positions[positionIndex] ?? null;
@@ -146,7 +196,7 @@ export function NotationSurface({
     const position = positions[nextIndex];
     if (!position || !adapter.current) return;
     setPositionIndex(nextIndex);
-    setHighlightWarning(!adapter.current.highlight(position));
+    setHighlightWarning(!adapter.current.highlight([position]));
   }
 
   function showSystem(nextSystem: number) {
@@ -165,6 +215,7 @@ export function NotationSurface({
       className="notation-panel"
       aria-labelledby="notation-title"
       data-render-complete={layout?.complete ?? false}
+      data-layer-emphasis={resolvedLayerEmphasis.value ? "verified" : "none"}
     >
       <div className="notation-heading">
         <div>
@@ -190,6 +241,16 @@ export function NotationSurface({
           <strong>Notation could not be displayed.</strong>
           <p>{error.message}</p>
           <code>{error.code}</code>
+        </div>
+      )}
+
+      {resolvedLayerEmphasis.value && !error && (
+        <div className="notation-layer-legend" aria-label="Notation layer emphasis">
+          <strong>{resolvedLayerEmphasis.value.label}</strong>
+          <span><i data-layer-swatch="active" />Active material ({resolvedLayerEmphasis.value.activeEventIds.length})</span>
+          {resolvedLayerEmphasis.value.inactiveEventIds.length > 0 && (
+            <span><i data-layer-swatch="inactive" />Visible context ({resolvedLayerEmphasis.value.inactiveEventIds.length})</span>
+          )}
         </div>
       )}
 
@@ -247,6 +308,13 @@ export function NotationSurface({
         <p className="renderer-warning" role="status">
           <strong>VIEWER_CURSOR_POSITION_UNAVAILABLE:</strong> the canonical position is identified,
           but OSMD could not place its visual cursor exactly there.
+        </p>
+      )}
+
+      {layerWarning && (
+        <p className="renderer-warning" role="status">
+          <strong>TMM_PRESENTATION_LAYER_RENDER_UNAVAILABLE:</strong> the active and context
+          identities are verified, but the renderer could not style every target exactly.
         </p>
       )}
 

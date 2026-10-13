@@ -69,21 +69,32 @@ try {
   if (!originalDigest || originalDigest.length !== 64) {
     throw new Error("expected-content fingerprint is unavailable");
   }
+  await page.getByRole("button", { name: "Open practice screen" }).click();
+  await page.locator('.notation-panel[data-render-complete="true"]').waitFor({ timeout: 120_000 });
+  await page.locator(".virtual-piano-panel").waitFor();
+  await page.getByRole("button", { name: "Close practice screen" }).click();
+  await page.getByText("Setup, calibration, and evidence", { exact: true }).click();
   for (const label of ["Count in", "Show notation", "Light piano keys"]) {
     await page.getByLabel(label).evaluate((element) => {
       if (!(element instanceof HTMLInputElement)) throw new Error("practice aid is not an input");
       element.click();
     });
   }
+  await page.getByRole("button", { name: "Open practice screen" }).click();
   if (await page.locator(".notation-panel").count()) throw new Error("notation aid did not hide");
   if (await page.locator(".virtual-piano-panel").count()) throw new Error("piano aid did not hide");
   if ((await lesson.getAttribute("data-expected-content")) !== originalDigest) {
     throw new Error("presentation aid changed expected musical content");
   }
+  await page.getByRole("button", { name: "Close practice screen" }).click();
 
   await page.getByRole("button", { name: "Next exercise" }).click();
   await page.getByText("BEGINNER LESSON · STEP 2 OF 16", { exact: true }).waitFor();
-  await page.getByRole("heading", { name: "Measures 1–2", exact: true }).waitFor();
+  await page.getByRole("heading", { name: "Measure 1", exact: true }).waitFor();
+  await page.getByRole("button", { name: "Open practice screen" }).click();
+  await page.locator('.practice-stage .notation-panel[data-render-complete="true"]').waitFor({ timeout: 120_000 });
+  await page.locator(".practice-stage .virtual-piano-panel").waitFor();
+  await page.getByRole("button", { name: "Close practice screen" }).click();
   const secondDigest = await lesson.getAttribute("data-expected-content");
   if (!secondDigest || secondDigest === originalDigest) {
     throw new Error("lesson navigation did not select a new expected exercise");
@@ -99,7 +110,8 @@ try {
     teaching: true,
     steps: 16,
     first_range: "1-8",
-    second_range: "1-2",
+    second_range: "1",
+    second_exercise_rendered: true,
     aids_reversible: true,
     expected_content_stable: true,
   })}\n`);

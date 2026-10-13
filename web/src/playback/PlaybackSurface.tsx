@@ -20,6 +20,7 @@ interface PlaybackSurfaceProps {
   countIn?: CountInSpec | null;
   heading?: string;
   eyebrow?: string;
+  onComplete?: () => void;
 }
 
 const initialSnapshot = (durationMicroseconds: number): PlaybackSnapshot => ({
@@ -48,8 +49,10 @@ export function PlaybackSurface({
   countIn = null,
   heading = "Listen to this score",
   eyebrow = "CANONICAL PIANO PLAYBACK",
+  onComplete,
 }: PlaybackSurfaceProps) {
   const controller = useRef<PlaybackController | null>(null);
+  const completionNotified = useRef(false);
   const [snapshot, setSnapshot] = useState(() => initialSnapshot(plan.duration_microseconds));
 
   useEffect(() => {
@@ -61,6 +64,14 @@ export function PlaybackSurface({
         setSnapshot(nextSnapshot);
         onFocusEventIds?.(nextSnapshot.focusEventIds);
         onActiveNotes?.(nextSnapshot.activeNotes);
+        if (nextSnapshot.status === "complete") {
+          if (!completionNotified.current) {
+            completionNotified.current = true;
+            onComplete?.();
+          }
+        } else {
+          completionNotified.current = false;
+        }
       }, countIn);
       controller.current = nextController;
       return () => {
@@ -76,7 +87,7 @@ export function PlaybackSurface({
       });
       return undefined;
     }
-  }, [controllerFactory, countIn, onActiveNotes, onFocusEventIds, plan]);
+  }, [controllerFactory, countIn, onActiveNotes, onComplete, onFocusEventIds, plan]);
 
   const playLabel =
     snapshot.status === "paused"

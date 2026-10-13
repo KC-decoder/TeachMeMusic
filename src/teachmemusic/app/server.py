@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 
 from .api import create_app
+from .curriculum_runs import default_curriculum_store
 
 
 def create_loopback_socket() -> socket.socket:
@@ -30,7 +31,12 @@ def main() -> None:
     token = secrets.token_urlsafe(32)
     listener = create_loopback_socket()
     port = listener.getsockname()[1]
-    app = create_app(launch_token=token, static_directory=frontend)
+    evidence_root = Path(__file__).resolve().parents[3] / ".teachmemusic" / "evidence"
+    app = create_app(
+        launch_token=token,
+        curriculum_store=default_curriculum_store(evidence_root),
+        static_directory=frontend,
+    )
     print(f"TeachMeMusic: http://127.0.0.1:{port}/")
     config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="info")
     try:

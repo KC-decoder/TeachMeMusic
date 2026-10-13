@@ -60,6 +60,7 @@ WEB_PACKAGE = ROOT / "web/package.json"
 WEB_LOCK = ROOT / "web/package-lock.json"
 EXPECTED_WEB_DEPENDENCIES = {
     "opensheetmusicdisplay": "2.1.3",
+    "qrcode.react": "4.2.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tone": "15.1.22",
@@ -151,6 +152,8 @@ def test_dev005_browser_proof_dependencies_are_exact_and_hash_locked() -> None:
     assert lock["packages"][""]["devDependencies"] == manifest["devDependencies"]
     assert lock["packages"]["node_modules/opensheetmusicdisplay"]["version"] == "2.1.3"
     assert lock["packages"]["node_modules/opensheetmusicdisplay"]["license"] == ("BSD-3-Clause")
+    assert lock["packages"]["node_modules/qrcode.react"]["version"] == "4.2.0"
+    assert lock["packages"]["node_modules/qrcode.react"]["license"] == "ISC"
     assert lock["packages"]["node_modules/playwright"]["version"] == "1.60.0"
     assert lock["packages"]["node_modules/playwright"]["license"] == "Apache-2.0"
     assert lock["packages"]["node_modules/tone"]["version"] == "15.1.22"

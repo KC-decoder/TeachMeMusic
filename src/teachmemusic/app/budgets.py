@@ -17,6 +17,11 @@ class AppBudgets:
     max_notes: int = 20_000
     max_anchors: int = 20_000
     max_navigation_sections: int = 128
+    max_attempt_messages: int = 20_000
+    max_attempt_diagnostics: int = 256
+    max_evidence_bytes: int = 16 * 1024 * 1024
+    max_mobile_message_bytes: int = 4 * 1024
+    max_mobile_result_bytes: int = 256 * 1024
 
 
 DEFAULT_APP_BUDGETS = AppBudgets()

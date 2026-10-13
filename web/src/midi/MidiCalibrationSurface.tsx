@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import { midiNoteName } from "../piano/model";
 import { BrowserMidiSession } from "./BrowserMidiSession";
-import type { MidiSnapshot } from "./contracts";
+import type { CalibrationRecord, MidiSnapshot } from "./contracts";
 
 interface MidiCalibrationSurfaceProps {
   createSession?: () => BrowserMidiSession;
+  session?: BrowserMidiSession;
+  onApproved?: (calibration: CalibrationRecord) => void;
 }
 
 function permissionMessage(snapshot: MidiSnapshot): string {
@@ -29,8 +31,13 @@ function evidenceFilename(): string {
   return `teachmemusic-midi-calibration-${new Date().toISOString().replaceAll(":", "-")}.json`;
 }
 
-export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurfaceProps) {
-  const [session] = useState(() => createSession?.() ?? new BrowserMidiSession());
+export function MidiCalibrationSurface({
+  createSession,
+  session: suppliedSession,
+  onApproved,
+}: MidiCalibrationSurfaceProps) {
+  const [createdSession] = useState(() => createSession?.() ?? new BrowserMidiSession());
+  const session = suppliedSession ?? createdSession;
   const [snapshot, setSnapshot] = useState(() => session.current());
   const [selectedInputId, setSelectedInputId] = useState("");
 
@@ -38,9 +45,9 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
     const unsubscribe = session.subscribe(setSnapshot);
     return () => {
       unsubscribe();
-      session.dispose();
+      if (!suppliedSession) session.dispose();
     };
-  }, [session]);
+  }, [session, suppliedSession]);
 
   const activeInputId = selectedInputId &&
       snapshot.inputs.some((item) => item.id === selectedInputId && item.state === "connected")
@@ -78,7 +85,8 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
     snapshot.permission === "error";
   const canConnect = snapshot.permission === "granted" && activeInputId !== "" &&
     snapshot.connection === "disconnected";
-  const canStart = snapshot.connection === "connected" && snapshot.capture !== "recording";
+  const canStart = snapshot.connection === "connected" &&
+    snapshot.capture_purpose !== "attempt" && snapshot.capture !== "recording";
 
   return (
     <section className="midi-panel" aria-labelledby="midi-title">
@@ -156,7 +164,7 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
                 {snapshot.capture === "idle" ? "Start calibration" : "Restart calibration"}
               </button>
             )}
-            {snapshot.capture === "recording" && (
+            {snapshot.capture_purpose === "calibration" && snapshot.capture === "recording" && (
               <>
                 <button type="button" className="midi-primary" onClick={() => session.stopCalibration()}>
                   Stop and review
@@ -166,7 +174,7 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
                 <button type="button" onClick={() => session.stopForDiscomfort()}>Stop — discomfort</button>
               </>
             )}
-            {snapshot.capture === "paused" && (
+            {snapshot.capture_purpose === "calibration" && snapshot.capture === "paused" && (
               <>
                 <button type="button" className="midi-primary" onClick={() => session.resumeCalibration()}>
                   Resume input
@@ -178,7 +186,7 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
             )}
           </div>
 
-          {snapshot.capture !== "idle" && (
+          {snapshot.capture_purpose === "calibration" && snapshot.capture !== "idle" && (
             <div className="midi-evidence" aria-live="polite">
               <div><small>Raw messages</small><strong>{snapshot.raw_messages.length}</strong></div>
               <div><small>Played notes</small><strong>{noteOns.length}</strong></div>
@@ -196,7 +204,7 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
             </div>
           )}
 
-          {snapshot.capture === "aborted" && (
+          {snapshot.capture_purpose === "calibration" && snapshot.capture === "aborted" && (
             <p className="midi-alert" role="status">Calibration stopped. No learner error or score was recorded.</p>
           )}
 
@@ -219,7 +227,11 @@ export function MidiCalibrationSurface({ createSession }: MidiCalibrationSurface
                   type="button"
                   className="midi-primary"
                   disabled={!snapshot.calibration.pitch_numbering_confirmed || snapshot.calibration.note_on_count < 5}
-                  onClick={() => session.approveCalibration()}
+                  onClick={() => {
+                    session.approveCalibration();
+                    const approved = session.current().calibration;
+                    if (approved?.approved) onApproved?.(approved);
+                  }}
                 >
                   Approve calibration evidence
                 </button>

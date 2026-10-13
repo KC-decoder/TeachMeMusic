@@ -1,5 +1,19 @@
 """Pure learner-performance contracts independent of MIDI and browser adapters."""
 
+from .alignment import (
+    ALIGNMENT_POLICY_VERSION,
+    COMBINED_LAYER_ALIGNMENT_POLICY_VERSION,
+    LAYER_ALIGNMENT_POLICY_VERSION,
+    AttemptAlignmentError,
+    ExpectedLayerComponent,
+    ExpectedLayerMembership,
+    ExpectedLayerTarget,
+    ExpectedPerformance,
+    ExpectedPerformanceNote,
+    align_attempt,
+    align_layer_attempt,
+    expected_layer_target_fingerprint,
+)
 from .contracts import (
     PERFORMANCE_CONTRACT_ID,
     PERFORMANCE_CONTRACT_VERSION,
@@ -33,11 +47,20 @@ from .validation import (
 )
 
 __all__ = [
+    "ALIGNMENT_POLICY_VERSION",
+    "COMBINED_LAYER_ALIGNMENT_POLICY_VERSION",
+    "LAYER_ALIGNMENT_POLICY_VERSION",
     "PERFORMANCE_CONTRACT_ID",
     "PERFORMANCE_CONTRACT_VERSION",
     "AttemptCompletion",
+    "AttemptAlignmentError",
     "CalibrationProfile",
     "EvidenceConfidence",
+    "ExpectedLayerComponent",
+    "ExpectedLayerMembership",
+    "ExpectedLayerTarget",
+    "ExpectedPerformance",
+    "ExpectedPerformanceNote",
     "LearnerAttempt",
     "MidiEventKind",
     "NormalizedMidiEvent",
@@ -51,6 +74,9 @@ __all__ = [
     "PerformanceValidationIssue",
     "RawMidiMessage",
     "SelfReportItem",
+    "align_attempt",
+    "align_layer_attempt",
+    "expected_layer_target_fingerprint",
     "is_stable_id",
     "performance_bundle_from_dict",
     "performance_bundle_from_json",

@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "authority": "golden-oracle",
+    "human_evidence_eligible": false,
+    "purpose": "Reviewed structural expectations for deterministic software verification only.",
+    "schema_version": "0.1.0"
+  },
+  "happy-birthday-rhythm-ready": {
+    "profile_kind": "rhythm-ready",
+    "report_fingerprint": "f070d8c795a369df55de3fc1e1d0dda8866343a2acf834d52b99c4aa700186cb",
+    "structure": {
+      "chord_count": 9,
+      "controlled_percentages": [
+        100,
+        100,
+        100
+      ],
+      "diagnostic_codes": [],
+      "layer_count": 2,
+      "measure_count": 8,
+      "primitive_ids": [
+        "PRIM-AUR-001",
+        "PRIM-AUR-002",
+        "PRIM-COORD-001",
+        "PRIM-COORD-002",
+        "PRIM-HAR-001",
+        "PRIM-HAR-002",
+        "PRIM-KEY-001",
+        "PRIM-KEY-002",
+        "PRIM-LAY-001",
+        "PRIM-MEM-001",
+        "PRIM-PAT-001",
+        "PRIM-READ-001",
+        "PRIM-READ-002",
+        "PRIM-RHY-001",
+        "PRIM-RHY-002",
+        "PRIM-TECH-001"
+      ],
+      "resolution": "resolved",
+      "scope_shapes": [
+        [
+          "upper-layer",
+          "resolved",
+          25,
+          34,
+          0,
+          1
+        ],
+        [
+          "lower-layer",
+          "resolved",
+          34,
+          25,
+          0,
+          1
+        ],
+        [
+          "combined",
+          "resolved",
+          59,
+          0,
+          2,
+          2
+        ]
+      ],
+      "staff_count": 2,
+      "stage_kinds": [
+        "component-acquisition",
+        "component-acquisition",
+        "self-paced-coordination",
+        "pulse-integration",
+        "phrase-controlled-tempo",
+        "learned-to-date",
+        "tempo-development"
+      ],
+      "voice_count": 2
+    }
+  },
+  "hot-cross-buns-reduced": {
+    "profile_kind": "reduced-tempo",
+    "report_fingerprint": "0ee85360c021b775e8e22a3d14f7ba89facbdf1db9e843710026f8178ab56d4f",
+    "structure": {
+      "chord_count": 0,
+      "controlled_percentages": [
+        55
+      ],
+      "diagnostic_codes": [],
+      "layer_count": 1,
+      "measure_count": 8,
+      "primitive_ids": [
+        "PRIM-AUR-001",
+        "PRIM-AUR-002",
+        "PRIM-KEY-001",
+        "PRIM-KEY-002",
+        "PRIM-LAY-001",
+        "PRIM-MEM-001",
+        "PRIM-PAT-001",
+        "PRIM-READ-001",
+        "PRIM-READ-002",
+        "PRIM-RHY-001",
+        "PRIM-RHY-002",
+        "PRIM-RHY-003",
+        "PRIM-TECH-001"
+      ],
+      "resolution": "resolved",
+      "scope_shapes": [
+        [
+          "single-layer",
+          "resolved",
+          20,
+          0,
+          0,
+          1
+        ]
+      ],
+      "staff_count": 1,
+      "stage_kinds": [
+        "component-acquisition",
+        "pulse-integration",
+        "phrase-controlled-tempo",
+        "learned-to-date",
+        "tempo-development"
+      ],
+      "voice_count": 1
+    }
+  },
+  "moonlight-measures-1-4-rhythm-ready": {
+    "profile_kind": "rhythm-ready",
+    "report_fingerprint": "81c0126b76da6899e37e9888b6dba33b2f1598bc5c24e281e7b43f763a383c02",
+    "review_status": "project-owner-review-required",
+    "structure": {
+      "chord_count": 6,
+      "controlled_percentages": [
+        100,
+        100,
+        100
+      ],
+      "diagnostic_codes": [],
+      "layer_count": 2,
+      "measure_count": 4,
+      "primitive_ids": [
+        "PRIM-AUR-001",
+        "PRIM-AUR-002",
+        "PRIM-COORD-001",
+        "PRIM-COORD-002",
+        "PRIM-HAR-001",
+        "PRIM-HAR-002",
+        "PRIM-KEY-001",
+        "PRIM-KEY-002",
+        "PRIM-LAY-001",
+        "PRIM-MEM-001",
+        "PRIM-PAT-001",
+        "PRIM-READ-001",
+        "PRIM-READ-002",
+        "PRIM-RHY-001",
+        "PRIM-RHY-002",
+        "PRIM-RHY-003"
+      ],
+      "resolution": "resolved",
+      "scope_shapes": [
+        [
+          "upper-layer",
+          "resolved",
+          48,
+          12,
+          0,
+          1
+        ],
+        [
+          "lower-layer",
+          "resolved",
+          12,
+          48,
+          0,
+          1
+        ],
+        [
+          "combined",
+          "resolved",
+          60,
+          0,
+          2,
+          2
+        ]
+      ],
+      "staff_count": 2,
+      "stage_kinds": [
+        "component-acquisition",
+        "component-acquisition",
+        "self-paced-coordination",
+        "pulse-integration",
+        "phrase-controlled-tempo",
+        "learned-to-date",
+        "tempo-development"
+      ],
+      "voice_count": 2
+    }
+  }
+}

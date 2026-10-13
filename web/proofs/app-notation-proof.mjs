@@ -108,8 +108,19 @@ try {
   const results = [];
   for (const fixture of fixtures) {
     process.stderr.write(`checking ${fixture.label}\n`);
-    await page.locator('input[type="file"]').setInputFiles(fixture.path);
-    await page.getByRole("heading", { name: fixture.displayTitle, exact: true }).first().waitFor();
+    await page.locator('input[type="file"]').first().setInputFiles(fixture.path);
+    try {
+      await page.getByRole("heading", { name: fixture.displayTitle, exact: true }).first().waitFor({
+        timeout: 120_000,
+      });
+    } catch (error) {
+      const visibleState = await page.locator(".status, .message").allTextContents();
+      throw new Error(
+        `${fixture.label}: score did not become ready (${visibleState.join(" | ")}; ${failures.join(" | ")})`,
+        { cause: error },
+      );
+    }
+    await page.getByRole("button", { name: "Open practice screen" }).click();
     const canvas = page.getByRole("img", {
       name: `Rendered notation for ${fixture.ariaTitle}`,
     });
@@ -160,6 +171,7 @@ try {
       await page.getByText(new RegExp(`^${fixture.expectedDiagnostic}:`)).waitFor();
     }
     results.push({ title: fixture.label, page_label: pageLabel, system_label: systemLabel, ...result });
+    await page.getByRole("button", { name: "Close practice screen" }).click();
   }
   if (failures.length) throw new Error(failures.join("; "));
   process.stdout.write(`${JSON.stringify({ rendered: true, fixtures: results })}\n`);

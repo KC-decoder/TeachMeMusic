@@ -89,8 +89,9 @@ test("TEST-APP-NOTATION-003 navigates canonical events, systems, and pages", asy
         { index: 2, pageIndex: 1, measureIndexes: [2] },
       ],
     }),
-    highlight: (position) => {
-      highlighted.push(position.canonicalIds);
+    emphasizeLayers: () => true,
+    highlight: (positions) => {
+      highlighted.push(positions.flatMap((position) => position.canonicalIds));
       return true;
     },
     dispose: vi.fn(),
@@ -119,6 +120,7 @@ test("TEST-APP-NOTATION-004 surfaces renderer failures without partial controls"
     load: async () => {
       throw new NotationAdapterError("VIEWER_OSMD_RENDER_FAILED", "The score did not render.");
     },
+    emphasizeLayers: () => false,
     highlight: () => false,
     dispose: vi.fn(),
   };
@@ -142,8 +144,9 @@ test("TEST-APP-PLAYBACK-006 moves the notation cursor from canonical audio-clock
       diagnostics: [],
       systems: [{ index: 0, pageIndex: 0, measureIndexes: [0, 1, 2] }],
     }),
-    highlight: (position) => {
-      highlighted.push(position.canonicalIds);
+    emphasizeLayers: () => true,
+    highlight: (positions) => {
+      highlighted.push(positions.flatMap((position) => position.canonicalIds));
       return true;
     },
     dispose: vi.fn(),
@@ -163,4 +166,129 @@ test("TEST-APP-PLAYBACK-006 moves the notation cursor from canonical audio-clock
   );
   expect(await screen.findByText("Measure 2 · offset 0 quarters")).toBeInTheDocument();
   expect(highlighted.at(-1)).toEqual(["event:three"]);
+});
+
+test("TEST-APP-PLAYBACK-008 highlights every concurrently sounding score position", async () => {
+  const highlighted: Array<{ positions: string[][]; focused: readonly string[] | undefined }> = [];
+  const fake: NotationAdapter = {
+    load: async () => ({
+      pageCount: 1,
+      complete: true,
+      renderedMeasures: 3,
+      totalMeasures: 3,
+      diagnostics: [],
+      systems: [{ index: 0, pageIndex: 0, measureIndexes: [0, 1, 2] }],
+    }),
+    emphasizeLayers: () => true,
+    highlight: (positions, focused) => {
+      highlighted.push({
+        positions: positions.map((position) => position.canonicalIds),
+        focused,
+      });
+      return true;
+    },
+    dispose: vi.fn(),
+  };
+  const factory = () => fake;
+
+  const { rerender } = render(
+    <NotationSurface bundle={bundle} adapterFactory={factory} focusEventIds={[]} />,
+  );
+  await screen.findByText("Measure 1 · offset 0 quarters");
+  rerender(
+    <NotationSurface
+      bundle={bundle}
+      adapterFactory={factory}
+      focusEventIds={["event:one", "event:two"]}
+    />,
+  );
+
+  expect(await screen.findByText("Measure 1 · offset 1 quarters")).toBeInTheDocument();
+  expect(highlighted.at(-1)).toEqual({
+    positions: [["event:one"], ["event:two"]],
+    focused: ["event:one", "event:two"],
+  });
+});
+
+test("TEST-APP-NOTATION-005 presents active material and complete context accessibly", async () => {
+  const emphasized: Array<{ active: readonly string[]; inactive: readonly string[] }> = [];
+  const fake: NotationAdapter = {
+    load: async () => ({
+      pageCount: 1,
+      complete: true,
+      renderedMeasures: 1,
+      totalMeasures: 1,
+      diagnostics: [],
+      systems: [{ index: 0, pageIndex: 0, measureIndexes: [0] }],
+    }),
+    emphasizeLayers: (_positions, active, inactive) => {
+      emphasized.push({ active, inactive });
+      return true;
+    },
+    highlight: () => true,
+    dispose: vi.fn(),
+  };
+
+  render(
+    <NotationSurface
+      bundle={bundle}
+      allowedEventIds={["event:one", "event:two"]}
+      layerEmphasis={{
+        label: "Upper layer",
+        activeTargets: [
+          {
+            canonical_id: "event:one",
+            canonical_kind: "event",
+            renderer_anchor: "part[0]/measure[0]/event[0]",
+          },
+        ],
+        inactiveTargets: [
+          {
+            canonical_id: "event:two",
+            canonical_kind: "event",
+            renderer_anchor: "part[0]/measure[0]/event[1]",
+          },
+        ],
+      }}
+      adapterFactory={() => fake}
+    />,
+  );
+
+  expect(await screen.findByLabelText("Notation layer emphasis")).toHaveTextContent(
+    "Upper layer",
+  );
+  expect(screen.getByText("Active material (1)")).toBeInTheDocument();
+  expect(screen.getByText("Visible context (1)")).toBeInTheDocument();
+  expect(emphasized).toEqual([{ active: ["event:one"], inactive: ["event:two"] }]);
+});
+
+test("TEST-APP-NOTATION-006 rejects a stale curriculum renderer target", async () => {
+  const factory = vi.fn(() => {
+    throw new Error("adapter must not load invalid layer data");
+  });
+
+  render(
+    <NotationSurface
+      bundle={bundle}
+      allowedEventIds={["event:one"]}
+      layerEmphasis={{
+        label: "Upper layer",
+        activeTargets: [
+          {
+            canonical_id: "event:one",
+            canonical_kind: "event",
+            renderer_anchor: "stale-renderer-anchor",
+          },
+        ],
+        inactiveTargets: [],
+      }}
+      adapterFactory={factory}
+    />,
+  );
+
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "TMM_PRESENTATION_LAYER_CROSSWALK",
+  );
+  expect(factory).not.toHaveBeenCalled();
+  expect(screen.queryByLabelText("Notation layer emphasis")).not.toBeInTheDocument();
 });

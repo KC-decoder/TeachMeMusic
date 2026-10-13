@@ -1,6 +1,7 @@
 """Tests for the deterministic automatic Beginner lesson planner."""
 
 from dataclasses import replace
+from fractions import Fraction
 from hashlib import sha256
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from teachmemusic.teaching import (
     LearnerTrack,
     LessonNodeKind,
     PlannerError,
+    PracticeMode,
     SkillDomain,
     generate_beginner_lesson_plan,
     lesson_plan_from_json,
@@ -64,7 +66,7 @@ def _measure_ranges(plan) -> tuple[tuple[int, ...], ...]:
 def test_hot_cross_buns_plan_matches_the_approved_external_oracle_shape(
     hot_cross_buns_package: CanonicalMusicPackage,
 ) -> None:
-    """TEST-PLANNER-001: the automatic HCB graph has the approved structure."""
+    """TEST-PLANNER-001: the amended automatic HCB graph has the approved structure."""
 
     first = _plan(hot_cross_buns_package, run_id="run:hcb-planner")
     second = _plan(hot_cross_buns_package, run_id="run:hcb-planner")
@@ -75,7 +77,7 @@ def test_hot_cross_buns_plan_matches_the_approved_external_oracle_shape(
     serialized = lesson_plan_to_json(first)
     assert lesson_plan_from_json(serialized) == first
     assert sha256(serialized.encode()).hexdigest() == (
-        "da3e827e5999fc24de1e9a3ea32752b24f3a27e53bbfc569e3cdf0114e1f68fc"
+        "254ae7cca884ea767df7d33979cf4b44e2474d52d635f55e4aa0bc275892cf00"
     )
     assert len(first.exercises) == len(first.nodes) == 16
     assert kinds.count(LessonNodeKind.EXERCISE) == 8
@@ -84,7 +86,7 @@ def test_hot_cross_buns_plan_matches_the_approved_external_oracle_shape(
     assert kinds.count(LessonNodeKind.TRANSFER) == 2
     assert _measure_ranges(first) == (
         (1, 2, 3, 4, 5, 6, 7, 8),
-        (1, 2),
+        (1,),
         (1, 2),
         (1, 2),
         (3, 4),
@@ -104,6 +106,14 @@ def test_hot_cross_buns_plan_matches_the_approved_external_oracle_shape(
         if exercise.synthetic_material is not None
     )
     assert synthetic == ((69, 67, 69), (71, 71, 71, 71))
+    orientation = first.exercises[0]
+    assert orientation.practice_modes == (PracticeMode.LISTEN,)
+    assert orientation.initial_support.tempo_percent == 70
+    assert orientation.initial_support.tempo_bpm == Fraction(336, 5)
+    first_bar = first.exercises[1]
+    assert first_bar.practice_modes == (PracticeMode.FOLLOW_PITCH,)
+    assert first_bar.initial_support.notation_visible is True
+    assert first_bar.initial_support.keyboard_highlighting is True
     assert first.exercises[-5].retention_successors
     assert first.exercises[-4].transfer_successors
 

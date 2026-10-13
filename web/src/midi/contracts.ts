@@ -9,6 +9,7 @@ export type MidiPermissionState =
 export type MidiConnectionState = "disconnected" | "connecting" | "connected";
 
 export type MidiCaptureState = "idle" | "recording" | "paused" | "stopped" | "aborted";
+export type MidiCapturePurpose = "calibration" | "attempt" | null;
 
 export type NormalizedMidiKind =
   | "note-on"
@@ -80,6 +81,10 @@ export interface MidiSnapshot {
   permission: MidiPermissionState;
   connection: MidiConnectionState;
   capture: MidiCaptureState;
+  capture_purpose: MidiCapturePurpose;
+  capture_started_at_utc: string | null;
+  capture_start_microseconds: number | null;
+  capture_end_microseconds: number | null;
   inputs: MidiInputSummary[];
   selected_input_id: string | null;
   raw_messages: RawMidiMessage[];
@@ -87,6 +92,17 @@ export interface MidiSnapshot {
   diagnostics: MidiDiagnostic[];
   active_notes: number[];
   calibration: CalibrationRecord | null;
+}
+
+export interface AttemptMidiSession {
+  current(): MidiSnapshot;
+  subscribe(listener: (snapshot: MidiSnapshot) => void): () => void;
+  startAttempt(): void;
+  stopAttempt(): void;
+  pauseAttempt(): void;
+  resumeAttempt(): void;
+  abortAttempt(): void;
+  stopAttemptForDiscomfort(): void;
 }
 
 export interface MidiMessageEventLike {

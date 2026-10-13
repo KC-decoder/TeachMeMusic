@@ -14,7 +14,9 @@ from teachmemusic.performance import (
 )
 
 TEACHING_CONTRACT_ID = "org.teachmemusic.teaching-evidence"
-TEACHING_CONTRACT_VERSION = "0.2.0"
+TEACHING_CONTRACT_VERSION = "0.3.0"
+EVIDENCE_ARCHIVE_CONTRACT_ID = "org.teachmemusic.teaching-evidence-archive"
+EVIDENCE_ARCHIVE_CONTRACT_VERSION = "0.1.0"
 
 
 class LearnerTrack(StrEnum):
@@ -148,6 +150,15 @@ class FeedbackTiming(StrEnum):
     END_OF_ATTEMPT = "end-of-attempt"
 
 
+class MasteryAction(StrEnum):
+    """Learner-facing action for the bounded beginner follow-pitch loop."""
+
+    RETRY = "retry"
+    SLOW_DOWN = "slow-down"
+    RETURN_TO_NORMAL = "return-to-normal"
+    EXERCISE_COMPLETE = "exercise-complete"
+
+
 class PlanAuditOutcome(StrEnum):
     """Owner/human disposition of the untouched generated plan."""
 
@@ -164,6 +175,7 @@ class RunEventKind(StrEnum):
     DATA_AUTHORIZED = "data-authorized"
     PLAN_GENERATED = "plan-generated"
     PLAN_AUDITED = "plan-audited"
+    SUPPORT_RECORDED = "support-recorded"
     CALIBRATION_RECORDED = "calibration-recorded"
     ATTEMPT_RECORDED = "attempt-recorded"
     OBSERVATION_RECORDED = "observation-recorded"
@@ -176,6 +188,24 @@ class RunEventKind(StrEnum):
     STOPPED = "stopped"
     EXPORTED = "exported"
     GATE_DECIDED = "gate-decided"
+
+
+class LearnerJournalKind(StrEnum):
+    """Owner-authored facts retained separately from measured performance."""
+
+    SELF_REPORT = "self-report"
+    OUTSIDE_PRACTICE = "outside-practice"
+    PAUSE = "pause"
+    STOP = "stop"
+    DISCOMFORT = "discomfort"
+
+
+class GateOutcome(StrEnum):
+    """Owner decisions available at an evaluation gate."""
+
+    PASS = "pass"
+    REMEDIATE_AND_REPEAT = "remediate-and-repeat"
+    FAIL_STOP = "fail-stop"
 
 
 @dataclass(frozen=True, slots=True)
@@ -436,6 +466,20 @@ class EvidenceRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class AttemptMastery:
+    """Deterministic note-event mastery summary without replacing raw evidence."""
+
+    correct_note_count: int
+    expected_note_count: int
+    extra_note_count: int
+    green_percent: int
+    threshold_percent: int
+    action: MasteryAction
+    next_node_id: str | None
+    reduced_tempo: bool
+
+
+@dataclass(frozen=True, slots=True)
 class FeedbackAction:
     """Factual feedback with one controllable next action."""
 
@@ -466,6 +510,31 @@ class PolicyDecision:
 
 
 @dataclass(frozen=True, slots=True)
+class LearnerJournalEntry:
+    """One append-only learner report or session-control fact."""
+
+    id: str
+    run_id: str
+    kind: LearnerJournalKind
+    recorded_at_utc: str
+    text: str
+    exercise_id: str | None = None
+    attempt_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class GateDecision:
+    """One explicit owner disposition at a named evaluation gate."""
+
+    id: str
+    run_id: str
+    gate_id: str
+    outcome: GateOutcome
+    decided_at_utc: str
+    reason: str
+
+
+@dataclass(frozen=True, slots=True)
 class RunEvent:
     """One append-only provenance event in a teaching run."""
 
@@ -490,10 +559,24 @@ class EvidenceExport:
     plans: tuple[LessonPlan, ...]
     audits: tuple[PlanAudit, ...]
     performance: PerformanceBundle
+    support_states: tuple[SupportState, ...] = ()
     evidence_records: tuple[EvidenceRecord, ...] = ()
     feedback_actions: tuple[FeedbackAction, ...] = ()
     policy_decisions: tuple[PolicyDecision, ...] = ()
+    journal_entries: tuple[LearnerJournalEntry, ...] = ()
+    gate_decisions: tuple[GateDecision, ...] = ()
     run_events: tuple[RunEvent, ...] = ()
     omissions: tuple[str, ...] = ()
     contract_id: str = TEACHING_CONTRACT_ID
     contract_version: str = TEACHING_CONTRACT_VERSION
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceArchive:
+    """Integrity envelope for one deterministic evidence export."""
+
+    evidence: EvidenceExport
+    evidence_sha256: str
+    integrity_algorithm: str = "sha256"
+    contract_id: str = EVIDENCE_ARCHIVE_CONTRACT_ID
+    contract_version: str = EVIDENCE_ARCHIVE_CONTRACT_VERSION
