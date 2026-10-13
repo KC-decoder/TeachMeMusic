@@ -25,7 +25,7 @@ The working traceability artifact. Columns:
 | Requirement | Introduced | Design/ADR | Implementation | Verification | Status |
 |---|---|---|---|---|---|
 | REQ-NFR-001 — Architectural boundary adherence | DEV-002 | ADR-0001, ADR-0003 | `src/teachmemusic/score/` boundary (module structure only) | Architecture review each increment | Accepted |
-| REQ-NFR-002 — Reproducibility | DEV-002 | ADR-0003 | `pyproject.toml`, `CONTRIBUTING.md` | Verification suite run in DEV-001/DEV-002 | Accepted |
+| REQ-NFR-002 — Reproducibility | DEV-002 | ADR-0003 | `pyproject.toml`, `README.md` | Verification suite run in DEV-001/DEV-002 | Accepted |
 | REQ-NFR-003 — Deliberate dependency management | DEV-002 | ADR-0002, ADR-0003 | `pyproject.toml` (zero runtime deps) | Review of dependency list each increment | Accepted |
 
 ## Functional Requirements

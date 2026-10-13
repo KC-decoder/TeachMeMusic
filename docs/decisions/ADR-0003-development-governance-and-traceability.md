@@ -39,8 +39,7 @@ Adopt a lightweight, **repository-centered** Agile governance system:
    dashboard, ADRs for significant decisions, requirement/traceability
    records for meaningful work — and no records for trivial changes.
 
-The full rules live in `docs/governance.md`; agent operating rules live in
-`AGENTS.md`.
+The full process and operating rules live in `docs/governance.md`.
 
 ## Alternatives Considered
 
@@ -62,9 +61,9 @@ The full rules live in `docs/governance.md`; agent operating rules live in
 
 - Every meaningful increment carries a small documentation overhead
   (status update, record, traceability update); trivial changes do not.
-- Coding agents are constrained by `AGENTS.md` (active increment only, no
-  invented requirements, no unverified "Verified" claims, human review
-  before commit).
+- Coding agents follow the repository governance rules: active increment only,
+  no invented requirements, no unverified "Verified" claims, and human review
+  before commit.
 - If the project outgrows the repository-centered system, tools can be
   introduced later and mapped onto the existing identifiers; the
   identifiers and records remain stable.

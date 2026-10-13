@@ -52,7 +52,7 @@ Research and auditability: any developer or agent must be able to rebuild
 the same verifiable state.
 
 Acceptance Criteria:
-- Documented setup in `CONTRIBUTING.md` works on a clean machine with the
+- Documented setup in `README.md` works on a clean machine with the
   stated Python version.
 - The verification suite (`pytest`, Ruff, mypy) can be run from the
   documented commands.

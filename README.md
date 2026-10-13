@@ -112,7 +112,8 @@ ruff format --check .
 mypy src/teachmemusic
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
+See [RUN_LOCAL.md](RUN_LOCAL.md) for local application instructions and
+[docs/governance.md](docs/governance.md) for development conventions.
 
 ## Repository Structure
 
@@ -120,9 +121,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 TeachMeMusic/
 ├── README.md               # This file
 ├── PROJECT_STATUS.md       # Append-only development log and LLM handoff
-├── AGENTS.md               # Operating rules for coding agents
 ├── CHANGELOG.md            # Notable changes (currently "Unreleased" only)
-├── CONTRIBUTING.md         # Development guide and conventions
 ├── pyproject.toml          # Project metadata, tooling configuration
 ├── src/
 │   └── teachmemusic/       # Python package

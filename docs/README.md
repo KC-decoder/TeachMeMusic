@@ -9,7 +9,6 @@ across artifacts — link to it.
 |----------|----------------|
 | `README.md` (root) | What is TeachMeMusic? |
 | `PROJECT_STATUS.md` (root) | Append-only chronological development log and cross-agent handoff |
-| `AGENTS.md` (root) | Operating rules for coding agents |
 | `docs/governance.md` | Development process: lifecycle, Definitions of Ready/Done, increment numbering, commit and Git conventions, versioning, tooling policy |
 | `docs/architecture.md` | How is TeachMeMusic structurally designed? (layers, boundaries, modularity) |
 | `docs/development-roadmap.md` | What capabilities exist conceptually, in what order? (Stages A–D) |
