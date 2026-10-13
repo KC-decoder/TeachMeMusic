@@ -10,27 +10,42 @@ and records the evidence used for feedback and progression.
 
 ## Current Development Status
 
-**Active increment:** DEV-009 — Generalizable Deterministic Piano Teaching
-Methodology.
+TeachMeMusic now provides an end-to-end deterministic piano-teaching system:
 
-- Tasks 9A–9N are complete. They establish the teaching-methodology contracts,
-  hierarchical curriculum graph, deterministic policy, functional fundamental
-  exercises, evidence model, replay boundary, metrics, and the rehearsed Happy
-  Birthday curriculum path.
-- Tasks 9O.1–9O.4 audited the complete production and research path and closed
-  the identified integration, evidence-storage, local-setup, privacy, and
-  repository-hygiene defects in the audited candidate.
-- Task 9O.5's clean technical readiness audit passed: the reproducible setup,
-  Python and frontend suites, production build, focused defect regressions,
-  launcher smoke test, dependency audit, and privacy checks all succeeded.
-- The current deterministic baseline is connected from score upload through
-  curriculum generation, MIDI-attempt evaluation, policy decisions,
-  content-addressed evidence, export, reconciliation, and exact replay.
-- The remaining DEV-009 administrative action is to commit and push the
-  audited public reproducibility update before formally closing Task 9O.
+- Imports MusicXML and compressed MXL scores, validates them, and converts
+  them into a TeachMeMusic-owned canonical representation.
+- Preserves and renders monophonic and polyphonic notation, including
+  multi-part, multi-staff, multi-voice, rhythmic, expressive, and structural
+  score information.
+- Analyzes each score to identify its musical material, technical demands,
+  playable layers, prerequisite skills, and bounded practice passages.
+- Builds a hierarchical curriculum that connects fundamental exercises
+  directly to the learner's chosen piece.
+- Generates separate-layer, combined-layer, cumulative, remediation,
+  support-fading, retention, transfer, and tempo-development activities.
+- Displays the active passage, plays its demonstration with synchronized
+  notation and piano-key highlighting, and keeps inactive musical context
+  visible.
+- Receives calibrated performances from a MIDI piano and compares the played
+  notes with the exact expected events.
+- Produces factual performance observations, mastery evidence, concise
+  learner feedback, progression decisions, and bounded recovery actions.
+- Adjusts assistance and tempo through transparent deterministic rules while
+  preserving the score, learner evidence, and policy decision trail.
+- Stores evidence locally in a content-addressed, integrity-checked format
+  with explicit capture, export, import, and deletion controls.
+- Exports complete teaching runs for reconciliation, exact deterministic
+  replay, metric generation, and reproducible research analysis.
+- Supports optional de-identified experiment tracking and a secure local
+  phone companion while the Mac retains MIDI capture.
+- Includes reproducible local setup, comprehensive automated verification,
+  production builds, dependency auditing, privacy safeguards, and tested
+  Happy Birthday and complex-score curriculum paths.
 
-No adaptive or reinforcement-learning policy is active in the application;
-those remain later experimental work.
+The implemented system is a robust deterministic research baseline. Its
+recorded state, actions, outcomes, and reward components provide the
+foundation for later controlled comparisons with adaptive and reinforcement-
+learning policies.
 
 ## What Works Today
 
