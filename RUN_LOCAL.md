@@ -1,60 +1,93 @@
 # Run TeachMeMusic Locally
 
-TeachMeMusic currently runs as a private local web application. The Python
-service listens only on the loopback interface, and uploaded scores are kept
-only in the running process.
+TeachMeMusic runs as a private local web application. Uploaded scores remain
+inside the running local service. Durable learner evidence is written only to
+the ignored owner-local `.teachmemusic/` directory.
 
 ## Requirements
 
 - macOS on Apple Silicon or Linux on x86-64;
-- Python 3.12 or 3.13;
-- Node.js 20 or newer with npm; and
-- desktop Google Chrome or Microsoft Edge for Web MIDI piano input.
+- CPython 3.12 or 3.13;
+- Node.js 20 or newer with npm;
+- Chrome or Edge for Web MIDI piano input.
 
 Safari can display the application but does not provide the Web MIDI support
-required for a connected piano.
+needed for a connected digital piano.
 
-## First run
+## First Run
 
-Clone the repository, enter it, and run:
+From a clone of the repository:
 
 ```bash
 ./scripts/setup-local.sh
 ./scripts/run-local.sh
 ```
 
-The setup command installs the exact platform-specific Python lock, installs
-the exact npm lock, and builds the browser interface. The run command prints a
-private address such as:
+The setup script selects the platform- and Python-specific hash lock, installs
+the exact frontend lock, installs the local package without dependency
+re-resolution, and builds the browser application.
+
+The launcher prints a private loopback address such as:
 
 ```text
 TeachMeMusic: http://127.0.0.1:54321/
 ```
 
-Open that address in desktop Chrome or Edge. Choose a MusicXML (`.xml` or
-`.musicxml`) or compressed MusicXML (`.mxl`) score. To use a digital piano,
-connect it before selecting **Allow MIDI access**, approve the browser prompt,
-select the visible input, and run the guided calibration.
+Open the address in Chrome or Edge.
 
-Press `Control-C` in the terminal to stop TeachMeMusic. The ephemeral score
-session is then discarded.
+## Run a Score
 
-## Later runs
+1. Choose a MusicXML (`.xml` or `.musicxml`) or compressed MXL (`.mxl`) file.
+2. Review the generated curriculum and authorize the local teaching run.
+3. Connect the digital piano and select **Allow MIDI access**.
+4. Select the visible MIDI input and complete calibration.
+5. Open an exercise, listen to its demonstration, and start an attempt.
+6. Play the requested material and submit the completed attempt.
+7. Review the factual feedback and deterministic next action.
+8. Export evidence only if an export was explicitly authorized.
 
-After the first setup, start the application with:
+The application does not substitute simulated learner input when MIDI is
+unavailable.
+
+Press `Control-C` in the terminal to stop the service. Live score sessions are
+then discarded; previously authorized durable evidence remains owner-local
+until explicitly deleted.
+
+## Later Runs
+
+After setup:
 
 ```bash
 ./scripts/run-local.sh
 ```
 
-Run `./scripts/setup-local.sh` again after pulling a change to the Python or
-browser dependency locks.
+Run `./scripts/setup-local.sh` again after pulling dependency-lock or frontend
+dependency changes.
 
-## Current limits
+## Verify the Clone
+
+```bash
+.venv/bin/pytest -q
+.venv/bin/ruff check src tests scripts
+.venv/bin/ruff format --check src tests scripts
+.venv/bin/mypy src/teachmemusic
+
+cd web
+npm test
+npm run build
+```
+
+## Optional Phone Companion
+
+The experimental phone companion has additional private-network and TLS
+requirements. Follow [RUN_MOBILE.md](RUN_MOBILE.md). The normal launcher above
+remains loopback-only.
+
+## Current Limits
 
 - This is a local research build, not a hosted service.
 - PDF sheet-music recognition is not an accepted input path.
-- MusicXML/MXL ingestion, notation, demonstration playback, beginner exercise
-  generation, virtual-piano highlighting, and calibrated Web MIDI capture are
-  available.
-- Automatic comparison and teaching feedback are planned but not yet present.
+- The active teaching policy is deterministic, not learned or stochastic.
+- Human learning effectiveness has not yet been established.
+- Mobile mode remains an experimental local-network companion, not a public
+  deployment.

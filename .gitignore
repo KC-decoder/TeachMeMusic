@@ -41,3 +41,9 @@ Thumbs.db
 # Application output (keep the directory itself via outputs/.gitkeep)
 outputs/*
 !outputs/.gitkeep
+
+# Owner-local personal and generated artifacts
+/IMG_*.HEIC
+/output/
+/wandb/
+/.teachmemusic/

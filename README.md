@@ -1,156 +1,176 @@
 # TeachMeMusic
 
-TeachMeMusic is a research project and application that transforms the sheet
-music selected by a learner into a structured, interactive learning
-experience. Given a musical score, TeachMeMusic aims to understand what is
-written, what is happening musically and technically, and how the material
-should be learned — then to teach the learner that piece.
+TeachMeMusic is a local research application that turns a MusicXML score into
+a deterministic, traceable piano-learning sequence.
 
-The initial instrument is **piano**. Learners will select a proficiency level
-(`Beginner`, `Intermediate`, or `Advanced`); the same piece is expected to
-yield different learning strategies for different levels.
+The current system reads MusicXML or compressed MXL, converts it into a
+TeachMeMusic-owned canonical representation, displays and plays the score,
+generates bounded beginner exercises, receives calibrated MIDI performances,
+and records the evidence used for feedback and progression.
 
-## Current Status
+## Current Development Status
 
-> **Early development - DEV-003 is complete; DEV-004 planning is next.**
->
-> The repository contains the project foundation (DEV-001) and the
-> development-governance system (DEV-002): package layout, tooling, and
-> documentation. DEV-003 established and project-owner approved the
-> authoritative Hot Cross Buns fixture ground truth after independent
-> MusicXML/PDF inspection and comparison; no musical discrepancies were
-> found. DEV-004 has not started. **No music parsing,
-> musical analysis, curriculum generation, or other product functionality
-> exists yet.**
->
-> For the chronological development log and current handoff, see
-> [PROJECT_STATUS.md](PROJECT_STATUS.md).
+**Active increment:** DEV-009 — Generalizable Deterministic Piano Teaching
+Methodology.
 
-## Product Vision
+- Tasks 9A–9N are complete. They establish the teaching-methodology contracts,
+  hierarchical curriculum graph, deterministic policy, functional fundamental
+  exercises, evidence model, replay boundary, metrics, and the rehearsed Happy
+  Birthday curriculum path.
+- Tasks 9O.1–9O.4 audited the complete production and research path and closed
+  the identified integration, evidence-storage, local-setup, privacy, and
+  repository-hygiene defects in the audited candidate.
+- Task 9O.5's clean technical readiness audit passed: the reproducible setup,
+  Python and frontend suites, production build, focused defect regressions,
+  launcher smoke test, dependency audit, and privacy checks all succeeded.
+- The current deterministic baseline is connected from score upload through
+  curriculum generation, MIDI-attempt evaluation, policy decisions,
+  content-addressed evidence, export, reconciliation, and exact replay.
+- The remaining DEV-009 administrative action is to commit and push the
+  audited public reproducibility update before formally closing Task 9O.
 
-TeachMeMusic aims to transform music selected by the learner into a structured
-learning experience:
+No adaptive or reinforcement-learning policy is active in the application;
+those remain later experimental work.
 
-```text
-Sheet Music
-     ↓
-Understand the score
-     ↓
-Understand the musical and technical demands
-     ↓
-Determine how the material should be learned
-     ↓
-Generate a structured curriculum
-     ↓
-Teach the learner interactively
-     ↓
-Help the learner perform the complete piece
+## What Works Today
+
+- MusicXML and compressed MXL ingestion through a validated canonical schema.
+- Conventional score display, sampled-piano playback, synchronized note
+  highlighting, and an 88-key virtual piano.
+- Deterministic curriculum generation from score content rather than filename
+  or title.
+- Layer-aware exercises for single-line and polyphonic piano music.
+- Demonstration, supported practice, remediation, support fading,
+  learned-to-date practice, and tempo-development stages.
+- Calibrated Web MIDI capture and expected-versus-played comparison.
+- Factual learner observations, deterministic policy decisions, concise
+  feedback, progression, and content-addressed local evidence.
+- Exact export, reconciliation, and replay of deterministic curriculum runs.
+- Optional de-identified metrics through an explicitly enabled tracker
+  boundary.
+- An experimental secure local-network phone companion while MIDI remains on
+  the Mac.
+
+The teaching policy is a deterministic research baseline. It is not yet a
+claim that the curriculum is optimal or that it improves learning across
+different learners.
+
+## Input Boundary
+
+The supported application input is:
+
+- `.musicxml` or `.xml` MusicXML;
+- `.mxl` compressed MusicXML.
+
+PDF sheet music is not currently an accepted application input. PDFs in the
+research fixtures are human comparison evidence only; optical music
+recognition remains separate future work.
+
+## Quick Start
+
+Requirements:
+
+- macOS on Apple Silicon or Linux on x86-64;
+- CPython 3.12 or 3.13;
+- Node.js 20 or newer with npm;
+- Chrome or Edge for Web MIDI input.
+
+Clone and start the local application:
+
+```bash
+git clone https://github.com/KC-decoder/TeachMeMusic.git
+cd TeachMeMusic
+./scripts/setup-local.sh
+./scripts/run-local.sh
 ```
 
-## Stage A — Read the Music
-
-Stage A accurately represents **what is written in a musical score**:
+The setup script selects the matching hash-locked Python environment, installs
+the exact npm lock, installs TeachMeMusic without re-resolving dependencies,
+and builds the browser interface. The launcher prints a private loopback URL,
+for example:
 
 ```text
-MusicXML / MXL
-    ↓
-Score ingestion (parser)
-    ↓
-TeachMeMusic canonical score representation
+TeachMeMusic: http://127.0.0.1:54321/
 ```
 
-Stage A intentionally does **not** determine difficulty, motifs, phrase
-structure, learner ability, teaching strategy, lesson boundaries, exercises,
-or performance quality - those belong to later stages. DEV-003 first
-establishes reference-score ground truth; the canonical score representation
-will be designed afterward (see [docs/score-schema.md](docs/score-schema.md)).
+Open that address in Chrome or Edge, choose a MusicXML/MXL score, and follow
+the application workflow. Browser audio and MIDI access require explicit user
+action.
 
-## Development Roadmap
+See [RUN_LOCAL.md](RUN_LOCAL.md) for the complete local workflow. The optional
+phone companion is documented in [RUN_MOBILE.md](RUN_MOBILE.md).
 
-| Stage | Question |
-|-------|----------|
-| **A — Read** | What is written in the music? |
-| **B — Understand** | What is happening musically and technically? |
-| **C — Plan** | How should someone at a specified level learn it? |
-| **D — Evaluate** | Is the generated learning plan pedagogically sensible? |
+## Verification
 
-See [docs/development-roadmap.md](docs/development-roadmap.md) for details.
+Run the Python verification from the repository root:
+
+```bash
+.venv/bin/pytest -q
+.venv/bin/ruff check src tests scripts
+.venv/bin/ruff format --check src tests scripts
+.venv/bin/mypy src/teachmemusic
+```
+
+Run the frontend verification:
+
+```bash
+cd web
+npm test
+npm run build
+```
+
+The repository includes the source fixtures, dependency locks, deterministic
+golden trajectories, and upstream licence needed by the executable test suite.
+Generated evidence, W&B output, credentials, build products, and personal
+files are excluded from source control.
 
 ## Architecture
 
-TeachMeMusic is organized around conceptual layers with strict boundaries:
+TeachMeMusic separates these boundaries:
 
-- **Score ingestion** — read and represent what is written (MusicXML/MXL).
-- **Musical analysis** — what is happening musically and technically.
-- **Pedagogical reasoning** — how the material should be learned.
-- **Curriculum generation** — what sequence of lessons to produce.
-- **Learner performance** — how the learner performed and how to adapt.
+1. score ingestion and canonical representation;
+2. musical and technical analysis;
+3. deterministic pedagogical requirements;
+4. curriculum assembly and presentation;
+5. learner-performance capture and factual comparison;
+6. policy decisions, evidence storage, replay, and metrics.
 
-Only the score-ingestion layer exists in this repository today. The
-fundamental architectural rule is that TeachMeMusic **owns its canonical
-internal representation of music**: external parsing libraries (eventually
-`music21`) terminate at the ingestion boundary, and every downstream
-component consumes the TeachMeMusic representation, never external library
-objects. See [docs/architecture.md](docs/architecture.md).
+External parsing-library objects terminate at the score-ingestion boundary.
+Every downstream component consumes TeachMeMusic contracts rather than an
+external library's object model.
 
-## Development Setup
+See:
 
-Requires Python 3.12+ (development was verified on Python 3.13).
+- [Architecture](docs/architecture.md)
+- [Canonical score schema](docs/score-schema.md)
+- [Development roadmap](docs/development-roadmap.md)
+- [Requirements](docs/requirements/README.md)
+- [Traceability matrix](docs/traceability/traceability-matrix.md)
+- [Architecture decisions](docs/decisions/README.md)
 
-```bash
-# 1. Create and activate a project-local virtual environment
-python3.13 -m venv venv
-source venv/bin/activate
+## Evidence and Privacy
 
-# 2. Install the project in editable mode with development tools
-python -m pip install -e ".[dev]"
+Uploaded score sessions remain local to the running service. Durable learner
+evidence is stored under the ignored `.teachmemusic/` owner-local directory.
+MIDI capture, optional self-report capture, and evidence export use separate
+authorizations. Export and optional external metrics are disabled unless the
+owner explicitly enables them.
 
-# 3. Run the checks
-pytest
-ruff check .
-ruff format --check .
-mypy src/teachmemusic
-```
+Do not commit certificates, private keys, learner evidence, W&B run output, or
+personal files.
 
-See [RUN_LOCAL.md](RUN_LOCAL.md) for local application instructions and
-[docs/governance.md](docs/governance.md) for development conventions.
+## Current Research Boundary
 
-## Repository Structure
+The repository establishes a deterministic teaching testbed and its
+reproducible evidence pipeline. Full human validation still requires a real
+end-to-end learner run followed by evidence export, reconciliation, and replay.
+Adaptive or reinforcement-learning policies are future experiments and are
+not active in the current teaching path.
 
-```text
-TeachMeMusic/
-├── README.md               # This file
-├── PROJECT_STATUS.md       # Append-only development log and LLM handoff
-├── CHANGELOG.md            # Notable changes (currently "Unreleased" only)
-├── pyproject.toml          # Project metadata, tooling configuration
-├── src/
-│   └── teachmemusic/       # Python package
-│       ├── score/          # Stage A module boundaries (not implemented)
-│       └── cli/            # Future CLI (not implemented)
-├── tests/                  # Test suite (foundation tests only, for now)
-├── examples/scores/        # Future example MusicXML/MXL scores
-├── docs/                   # Project documentation (see below)
-└── outputs/                # Generated application output (not committed)
-```
+TeachMeMusic is experimental research software, not a clinical, educational,
+or performance-certification product.
 
-## Documentation
+## Licence
 
-- [docs/README.md](docs/README.md) — documentation index and artifact responsibilities
-- [docs/governance.md](docs/governance.md) — development governance (lifecycle, Definitions of Ready/Done, commit and Git conventions)
-- [docs/architecture.md](docs/architecture.md) — layers, the canonical-representation boundary, modularity principles
-- [docs/development-roadmap.md](docs/development-roadmap.md) — stages A–D
-- [docs/requirements/](docs/requirements/README.md) — requirement conventions and established requirements
-- [docs/traceability/](docs/traceability/README.md) — traceability conventions and matrix
-- [docs/experiments/](docs/experiments/README.md) — experiment framework
-- [docs/score-schema.md](docs/score-schema.md) — status of the canonical score representation
-- [docs/decisions/](docs/decisions/README.md) — architecture decision records
-- [docs/development/](docs/development/001-project-foundation.md) — development journal (one record per increment)
-
-## Project Maturity
-
-> **Warning:** TeachMeMusic is experimental and incomplete. This repository
-> currently implements no product functionality. Nothing in this repository
-> reads, analyzes, or teaches music yet. Do not treat the documented roadmap
-> as an availability statement.
-
-Licensing for this project is **pending**; no license has been chosen.
+TeachMeMusic is licensed under the [MIT License](LICENSE). Dependency licence
+information is recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
